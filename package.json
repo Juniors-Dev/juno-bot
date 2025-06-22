@@ -1,0 +1,26 @@
+{
+  "name": "juno-bot",
+  "version": "1.0.0",
+  "description": "A bot for Juniors.dev",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/johnDavid97/Juno-bot.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/johnDavid97/Juno-bot/issues"
+  },
+  "homepage": "https://github.com/johnDavid97/Juno-bot#readme",
+  "dependencies": {
+    "discord.js": "^14.20.0",
+    "dotenv": "^16.5.0",
+    "node-cron": "^4.1.1",
+    "undici": "^7.10.0"
+  }
+}
