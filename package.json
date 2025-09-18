@@ -19,7 +19,7 @@
   "homepage": "https://github.com/johnDavid97/Juno-bot#readme",
   "dependencies": {
     "discord.js": "^14.20.0",
-    "dotenv": "^16.5.0",
+    "dotenv": "^16.6.1",
     "node-cron": "^4.1.1",
     "undici": "^7.10.0"
   }
