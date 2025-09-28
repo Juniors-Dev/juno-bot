@@ -1,0 +1,16 @@
+token= ""
+statusChannelId= ""
+chatSummaryChannelId= ""
+clientId= ""
+guildId= "" 
+sourceChannelIds= []
+ollamaUrl= "https://juno-ollama.fly.dev"
+ollamaModel= "tinyllama"
+
+HOST=localhost
+DATABASE_NAME=juno_time_dev
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=secret
+DIALECT=postgres
+CRUD_USERNAME=crud_user
+CRUD_PASSWORD=crud_password

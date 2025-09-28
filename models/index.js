@@ -1,9 +1,17 @@
-const Sequelize = require("sequelize");
-const fs = require("fs");
-const path = require("path");
-require("dotenv").config();
+import Sequelize from "sequelize";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+// recreate __dirname in ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const basename = path.basename(__filename);
+
 const sequelize = new Sequelize(
   process.env.DATABASE_NAME,
   process.env.ADMIN_USERNAME,
@@ -20,20 +28,20 @@ const sequelize = new Sequelize(
         rejectUnauthorized: false,
       },
     },
-  }
+  },
 );
 
-function createDatabase(options) {
+async function createDatabase(options) {
   const db = {};
   db.sequelize = options;
+
   fs.readdirSync(__dirname)
-    .filter((file) => {
-      return file.indexOf(".") !== 0 && file !== basename && file.slice(-3) === ".js";
-    })
-    .forEach((file) => {
-      const model = require(path.join(__dirname, file))(options, Sequelize);
+    .filter((file) => file.indexOf(".") !== 0 && file !== basename && file.slice(-3) === ".js")
+    .forEach(async (file) => {
+      const model = (await import(path.join(__dirname, file))).default(options, Sequelize);
       db[model.name] = model;
     });
+
   Object.keys(db).forEach((modelName) => {
     if (db[modelName].associate) {
       db[modelName].associate(db);
@@ -45,4 +53,4 @@ function createDatabase(options) {
 
 const adminDb = createDatabase(sequelize);
 
-module.exports = { db: crudDb, createDatabase, adminDb, ensureCrudUserPrivileges };
+export { createDatabase as db, adminDb };

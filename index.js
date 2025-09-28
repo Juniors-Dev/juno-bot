@@ -1,14 +1,15 @@
 import { Client, GatewayIntentBits, Collection } from "discord.js";
 import addCommands from "./utils/addCommands.js";
 import addEvents from "./utils/addEvents.js";
-import { required, parseIds } from "./utils/envHelpers.js";
+import { required } from "./utils/envHelpers.js";
+// import { required, parseIds } from "./utils/envHelpers.js";
 import addJobs from "./utils/addJobs.js";
 
 // ---- Read ENV ----
 const TOKEN = required("token");
-const STATUS_CHANNEL_ID = required("statusChannelId");
-const SUMMARY_CHANNEL_ID = required("chatSummaryChannelId");
-const SOURCE_CHANNEL_IDS = parseIds(required("sourceChannelIds"));
+// const STATUS_CHANNEL_ID = required("statusChannelId");
+// const SUMMARY_CHANNEL_ID = required("chatSummaryChannelId");
+// const SOURCE_CHANNEL_IDS = parseIds(required("sourceChannelIds"));
 // Optional (used by aiSummary.js likely)
 // const OLLAMA_URL = process.env.ollamaUrl;
 // const OLLAMA_MODEL = process.env.ollamaModel;
