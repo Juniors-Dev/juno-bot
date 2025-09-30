@@ -26,9 +26,9 @@ const client = new Client({
 client.commands = new Collection();
 
 // Load commands, events & add cron jobs
-addCommands(client);
-addEvents(client);
-addJobs(client);
+await addCommands(client);
+await addEvents(client);
+await addJobs(client);
 
 // Log in bot
 await client.login(TOKEN);
