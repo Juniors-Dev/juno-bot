@@ -24,8 +24,8 @@ const sequelize = new Sequelize(
       decimalNumbers: true,
       // Uncomment the following lines if you need to use SSL to connect to your database
       ssl: {
-        require: true,
-        rejectUnauthorized: false,
+        require: process.env.SSL || true,
+        rejectUnauthorized: process.env.DB_REJECT_UNAUTHORIZED || false,
       },
     },
   },
@@ -35,18 +35,20 @@ async function createDatabase(options) {
   const db = {};
   db.sequelize = options;
 
-  fs.readdirSync(__dirname)
-    .filter((file) => file.indexOf(".") !== 0 && file !== basename && file.slice(-3) === ".js")
-    .forEach(async (file) => {
-      const model = (await import(path.join(__dirname, file))).default(options, Sequelize);
-      db[model.name] = model;
-    });
+  const files = fs
+    .readdirSync(__dirname)
+    .filter((file) => file.indexOf(".") !== 0 && file !== basename && file.slice(-3) === ".js");
 
-  Object.keys(db).forEach((modelName) => {
-    if (db[modelName].associate) {
-      db[modelName].associate(db);
-    }
-  });
+  const models = await Promise.all(
+    files.map(async (file) => {
+      const model = (await import(path.join(__dirname, file))).default(options, Sequelize);
+      return model;
+    }),
+  );
+
+  for (const model of models) {
+    db[model.name] = model;
+  }
 
   return db;
 }
