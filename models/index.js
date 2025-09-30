@@ -50,9 +50,15 @@ async function createDatabase(options) {
     db[model.name] = model;
   }
 
+  Object.keys(db).forEach((modelName) => {
+    if (db[modelName].associate) {
+      db[modelName].associate(db);
+    }
+  });
+
   return db;
 }
 
-const adminDb = createDatabase(sequelize);
+const adminDb = await createDatabase(sequelize);
 
 export { createDatabase as db, adminDb };
