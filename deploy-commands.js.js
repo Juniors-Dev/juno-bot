@@ -4,13 +4,14 @@ import { REST, Routes } from "discord.js";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import { required } from "./utils/envHelpers.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const TOKEN = process.env.token;
-const CLIENT_ID = process.env.clientId;
-const GUILD_ID = process.env.guildId;
+const TOKEN = required("token");
+const CLIENT_ID = required("clientId");
+const GUILD_ID = required("guildId");
 
 const commands = [];
 const commandFiles = fs
