@@ -18,8 +18,8 @@ async function loadCommandsFromDir(client, dir) {
     } else if (entry.isFile() && entry.name.endsWith(".js")) {
       const mod = await import(fullPath);
       const command = mod.default ?? mod;
-      if (!command?.data?.name) {
-        console.warn(`⚠️ Skipped ${fullPath} (missing data.name)`);
+      if (!command?.data?.name || typeof command.execute !== "function") {
+        console.warn(`⚠️ Skipped ${fullPath} (missing data.name/execute)`);
         continue;
       }
       client.commands.set(command.data.name, command);

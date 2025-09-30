@@ -10,6 +10,10 @@ const addEvents = async (client) => {
   for (const file of eventFiles) {
     const event = await import(`./events/${file}`);
     const eventModule = event.default ?? event;
+    if (!eventModule.name || typeof eventModule.execute !== "function") {
+      console.warn(`Skipped event ${file}: missing name/execute`);
+      continue;
+    }
     if (eventModule.once)
       client.once(eventModule.name, (...args) => eventModule.execute(...args, client));
     else client.on(eventModule.name, (...args) => eventModule.execute(...args, client));
