@@ -36,6 +36,11 @@ export default (sequelize, Sequelize) => {
         },
         comment: "Links notification to a session - auto-cancel when session ends",
       },
+      channelId: {
+        type: DataTypes.STRING,
+        field: "channel_id",
+        comment: "If set, send notification to a specific channel instead of DM",
+      },
       title: {
         type: DataTypes.STRING,
       },
@@ -55,7 +60,6 @@ export default (sequelize, Sequelize) => {
           ],
         },
       },
-      comment: "DB will enforce CHECK(type IN... in migration",
       message: {
         type: DataTypes.TEXT,
         allowNull: false,
@@ -87,8 +91,6 @@ export default (sequelize, Sequelize) => {
         validate: {
           isIn: [["queued", "scheduled", "locked", "sent", "canceled", "error"]],
         },
-        comment:
-          "DB-enforced via CHECK(status IN ('queued','scheduled','locked','sent','canceled','error')) in migration",
       },
     },
     {
@@ -98,13 +100,7 @@ export default (sequelize, Sequelize) => {
       indexes: [
         {
           fields: ["user_id", "send_at"],
-          where: { is_active: true, status: ["queued", "scheduled", "error"] },
-          name: "ix__notifications__user_sendat__active_pending",
-        },
-        {
-          fields: ["session_id"],
-          where: { is_active: true, status: ["queued", "scheduled", "error"] },
-          name: "ix__notifications__session_id__active_pending",
+          name: "ix__notifications__user_sendat",
         },
         {
           fields: ["schedule_cron"],
