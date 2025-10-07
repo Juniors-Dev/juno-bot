@@ -58,6 +58,7 @@ export default (sequelize, Sequelize) => {
     Link.belongsTo(models.Project, {
       foreignKey: "project_id",
       as: "project",
+      onDelete: "CASCADE",
     });
   };
 
