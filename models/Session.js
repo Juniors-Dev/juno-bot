@@ -18,22 +18,6 @@ export default (sequelize, Sequelize) => {
           key: "id",
         },
       },
-      projectId: {
-        type: DataTypes.UUID,
-        field: "project_id",
-        references: {
-          model: "projects",
-          key: "id",
-        },
-      },
-      taskId: {
-        type: DataTypes.INTEGER,
-        field: "task_id",
-        references: {
-          model: "tasks",
-          key: "id",
-        },
-      },
       activity: {
         type: DataTypes.TEXT,
         comment: "What the user is working on / Status message",
@@ -86,16 +70,30 @@ export default (sequelize, Sequelize) => {
       onDelete: "CASCADE",
     });
 
-    Session.belongsTo(models.Project, {
-      foreignKey: "project_id",
-      as: "project",
-      constraints: false,
+    Session.belongsToMany(models.Project, {
+      through: models.SessionProject,
+      foreignKey: "session_id",
+      otherKey: "project_id",
+      as: "projects",
     });
 
-    Session.belongsTo(models.Task, {
-      foreignKey: "task_id",
-      as: "task",
-      constraints: false,
+    Session.belongsToMany(models.Task, {
+      through: models.SessionTask,
+      foreignKey: "session_id",
+      otherKey: "task_id",
+      as: "tasks",
+    });
+
+    Session.hasMany(models.SessionProject, {
+      foreignKey: "session_id",
+      as: "sessionProjects",
+      onDelete: "CASCADE",
+    });
+
+    Session.hasMany(models.SessionTask, {
+      foreignKey: "session_id",
+      as: "sessionTasks",
+      onDelete: "CASCADE",
     });
 
     Session.hasMany(models.Notification, {

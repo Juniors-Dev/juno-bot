@@ -27,7 +27,6 @@ export default (sequelize, Sequelize) => {
         validate: {
           isIn: [["active", "paused", "archived"]],
         },
-        comment: "DB-enforced via CHECK(status IN ('active','paused','archived')) in migration",
       },
     },
     {
@@ -52,6 +51,13 @@ export default (sequelize, Sequelize) => {
       as: "members",
     });
 
+    Project.belongsToMany(models.Session, {
+      through: models.SessionProject,
+      foreignKey: "project_id",
+      otherKey: "session_id",
+      as: "sessions",
+    });
+
     Project.hasMany(models.ProjectMember, {
       foreignKey: "project_id",
       as: "projectMembers",
@@ -64,10 +70,10 @@ export default (sequelize, Sequelize) => {
       onDelete: "CASCADE",
     });
 
-    Project.hasMany(models.Session, {
+    Project.hasMany(models.SessionProject, {
       foreignKey: "project_id",
-      as: "sessions",
-      onDelete: "SET NULL",
+      as: "sessionProjects",
+      onDelete: "CASCADE",
     });
 
     Project.hasMany(models.Task, {

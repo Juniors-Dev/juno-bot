@@ -44,8 +44,6 @@ export default (sequelize, Sequelize) => {
         validate: {
           isIn: [["todo", "in_progress", "done", "archived"]],
         },
-        comment:
-          "DB-enforced via CHECK(status IN ('todo','in_progress','done','archived')) in migration",
       },
       dueAt: {
         type: DataTypes.DATE,
@@ -73,16 +71,26 @@ export default (sequelize, Sequelize) => {
     Task.belongsTo(models.User, {
       foreignKey: "user_id",
       as: "user",
+      onDelete: "CASCADE",
     });
 
     Task.belongsTo(models.Project, {
       foreignKey: "project_id",
       as: "project",
+      onDelete: "CASCADE",
     });
 
-    Task.hasMany(models.Session, {
+    Task.belongsToMany(models.Session, {
+      through: models.SessionTask,
       foreignKey: "task_id",
+      otherKey: "session_id",
       as: "sessions",
+    });
+
+    Task.hasMany(models.SessionTask, {
+      foreignKey: "task_id",
+      as: "sessionTasks",
+      onDelete: "CASCADE",
     });
   };
 
