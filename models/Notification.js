@@ -43,6 +43,11 @@ export default (sequelize, Sequelize) => {
       },
       title: {
         type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notEmpty: true,
+          len: [1, 100],
+        },
       },
       type: {
         type: DataTypes.STRING,
