@@ -18,6 +18,14 @@ export default (sequelize, Sequelize) => {
           key: "id",
         },
       },
+      projectId: {
+        type: DataTypes.UUID,
+        field: "project_id",
+        references: {
+          model: "projects",
+          key: "id",
+        },
+      },
       title: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -53,6 +61,10 @@ export default (sequelize, Sequelize) => {
           fields: ["user_id", "status"],
           name: "ix__tasks__user_status",
         },
+        {
+          fields: ["project_id", "status"],
+          name: "ix__tasks__project_status",
+        },
       ],
     },
   );
@@ -61,6 +73,11 @@ export default (sequelize, Sequelize) => {
     Task.belongsTo(models.User, {
       foreignKey: "user_id",
       as: "user",
+    });
+
+    Task.belongsTo(models.Project, {
+      foreignKey: "project_id",
+      as: "project",
     });
 
     Task.hasMany(models.Session, {

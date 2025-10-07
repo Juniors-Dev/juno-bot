@@ -69,6 +69,11 @@ export default (sequelize, Sequelize) => {
       as: "sessions",
       onDelete: "SET NULL",
     });
+
+    Project.hasMany(models.Task, {
+      foreignKey: "project_id",
+      as: "tasks",
+    });
   };
 
   return Project;
