@@ -5,7 +5,7 @@ export default (sequelize, Sequelize) => {
     "Settings",
     {
       userId: {
-        type: DataTypes.STRING,
+        type: DataTypes.UUID,
         primaryKey: true,
         field: "user_id",
         references: {
