@@ -21,10 +21,8 @@ export default (sequelize, Sequelize) => {
         type: DataTypes.STRING,
         allowNull: false,
         defaultValue: "other",
-        validate: {
-          isIn: [["github", "figma", "docs", "other"]],
-        },
-        comment: "DB will enforce CHECK(kind IN ('github','figma','docs','other')) in migration",
+        validate: { notEmpty: true },
+        comment: "Category for the link (e.g., github, figma, docs etc.)",
       },
       url: {
         type: DataTypes.STRING,

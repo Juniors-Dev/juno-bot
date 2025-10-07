@@ -9,13 +9,13 @@ export default (sequelize, Sequelize) => {
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
       },
-      discordUserId: {
-        type: DataTypes.STRING,
+      userId: {
+        type: DataTypes.UUID,
         allowNull: false,
-        field: "discord_user_id",
+        field: "user_id",
         references: {
           model: "users",
-          key: "discord_user_id",
+          key: "id",
         },
       },
       projectId: {
@@ -36,11 +36,10 @@ export default (sequelize, Sequelize) => {
         },
         comment: "Links notification to a session - auto-cancel when session ends",
       },
-      type: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
       title: {
+        type: DataTypes.STRING,
+      },
+      type: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
@@ -98,7 +97,7 @@ export default (sequelize, Sequelize) => {
       underscored: true,
       indexes: [
         {
-          fields: ["discord_user_id", "send_at"],
+          fields: ["user_id", "send_at"],
           where: { is_active: true, status: ["queued", "scheduled", "error"] },
           name: "ix__notifications__user_sendat__active_pending",
         },
@@ -118,7 +117,7 @@ export default (sequelize, Sequelize) => {
 
   Notification.associate = (models) => {
     Notification.belongsTo(models.User, {
-      foreignKey: "discord_user_id",
+      foreignKey: "user_id",
       as: "user",
       onDelete: "CASCADE",
     });
@@ -133,7 +132,7 @@ export default (sequelize, Sequelize) => {
       foreignKey: "session_id",
       as: "session",
       constraints: false,
-      onDelete: "SET NULL",
+      onDelete: "CASCADE",
     });
   };
 

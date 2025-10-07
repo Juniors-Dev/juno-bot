@@ -48,7 +48,7 @@ export default (sequelize, Sequelize) => {
     Project.belongsToMany(models.User, {
       through: models.ProjectMember,
       foreignKey: "project_id",
-      otherKey: "discord_user_id",
+      otherKey: "user_id",
       as: "members",
     });
 

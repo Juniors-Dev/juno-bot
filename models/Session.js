@@ -9,13 +9,13 @@ export default (sequelize, Sequelize) => {
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
       },
-      discordUserId: {
-        type: DataTypes.STRING,
+      userId: {
+        type: DataTypes.UUID,
         allowNull: false,
-        field: "discord_user_id",
+        field: "user_id",
         references: {
           model: "users",
-          key: "discord_user_id",
+          key: "id",
         },
       },
       projectId: {
@@ -66,14 +66,13 @@ export default (sequelize, Sequelize) => {
       underscored: true,
       indexes: [
         {
-          //Partial unique (add with Umzug/migration)
           unique: true,
-          fields: ["discord_user_id"],
+          fields: ["user_id"],
           where: { ended_at: null },
-          name: "uq__sessions__discord_user_id__ended_at_null",
+          name: "uq__sessions__user_id__ended_at_null",
         },
         {
-          fields: ["discord_user_id", "started_at"],
+          fields: ["user_id", "started_at"],
           name: "ix__sessions__user_started_at",
         },
       ],
@@ -82,7 +81,7 @@ export default (sequelize, Sequelize) => {
 
   Session.associate = (models) => {
     Session.belongsTo(models.User, {
-      foreignKey: "discord_user_id",
+      foreignKey: "user_id",
       as: "user",
       onDelete: "CASCADE",
     });

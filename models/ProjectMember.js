@@ -18,14 +18,26 @@ export default (sequelize, Sequelize) => {
           key: "id",
         },
       },
-      discordUserId: {
-        type: DataTypes.STRING,
+      userId: {
+        type: DataTypes.UUID,
         allowNull: false,
-        field: "discord_user_id",
+        field: "user_id",
         references: {
           model: "users",
-          key: "discord_user_id",
+          key: "id",
         },
+      },
+      isAdmin: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+        field: "is_admin",
+      },
+      canAddLinks: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+        field: "can_add_links",
       },
       permissions: {
         type: DataTypes.JSONB,
@@ -46,12 +58,12 @@ export default (sequelize, Sequelize) => {
       indexes: [
         {
           unique: true,
-          fields: ["project_id", "discord_user_id"],
-          name: "uq__project_members__project_id_discord_user_id",
+          fields: ["project_id", "user_id"],
+          name: "uq__project_members__project_id_user_id",
         },
         {
-          fields: ["project_id"],
-          name: "ix__project_members__project_id",
+          fields: ["project_id", "is_admin"],
+          name: "ix__project_members__project_id_is_admin",
         },
       ],
     },
@@ -64,7 +76,7 @@ export default (sequelize, Sequelize) => {
     });
 
     ProjectMember.belongsTo(models.User, {
-      foreignKey: "discord_user_id",
+      foreignKey: "user_id",
       as: "user",
     });
   };

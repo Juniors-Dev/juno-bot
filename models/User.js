@@ -4,10 +4,15 @@ export default (sequelize, Sequelize) => {
   const User = sequelize.define(
     "User",
     {
-      discordUserId: {
-        type: DataTypes.STRING,
+      id: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
-        field: "discord_user_id",
+      },
+      discordId: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        field: "discord_id",
         validate: {
           notEmpty: true,
         },
@@ -32,6 +37,11 @@ export default (sequelize, Sequelize) => {
       indexes: [
         {
           unique: true,
+          fields: ["discord_id"],
+          name: "uq__users__discord_id",
+        },
+        {
+          unique: true,
           fields: ["github_username"],
           name: "uq__users__github_username",
         },
@@ -42,37 +52,37 @@ export default (sequelize, Sequelize) => {
   User.associate = (models) => {
     User.belongsToMany(models.Project, {
       through: models.ProjectMember,
-      foreignKey: "discord_user_id",
+      foreignKey: "user_id",
       otherKey: "project_id",
       as: "projects",
     });
 
     User.hasOne(models.Settings, {
-      foreignKey: "discord_user_id",
+      foreignKey: "user_id",
       as: "settings",
       onDelete: "CASCADE",
     });
 
     User.hasMany(models.ProjectMember, {
-      foreignKey: "discord_user_id",
+      foreignKey: "user_id",
       as: "projectMembers",
       onDelete: "CASCADE",
     });
 
     User.hasMany(models.Session, {
-      foreignKey: "discord_user_id",
+      foreignKey: "user_id",
       as: "sessions",
       onDelete: "CASCADE",
     });
 
     User.hasMany(models.Task, {
-      foreignKey: "discord_user_id",
+      foreignKey: "user_id",
       as: "tasks",
       onDelete: "CASCADE",
     });
 
     User.hasMany(models.Notification, {
-      foreignKey: "discord_user_id",
+      foreignKey: "user_id",
       as: "notifications",
       onDelete: "CASCADE",
     });

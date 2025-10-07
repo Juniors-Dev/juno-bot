@@ -4,13 +4,13 @@ export default (sequelize, Sequelize) => {
   const Settings = sequelize.define(
     "Settings",
     {
-      discordUserId: {
+      userId: {
         type: DataTypes.STRING,
         primaryKey: true,
-        field: "discord_user_id",
+        field: "user_id",
         references: {
           model: "users",
-          key: "discord_user_id",
+          key: "id",
         },
       },
       preferences: {
@@ -18,23 +18,17 @@ export default (sequelize, Sequelize) => {
         defaultValue: {},
         comment: "All user preferences (personas, notifications, etc.)",
       },
-      updatedAt: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.NOW,
-        field: "updated_at",
-      },
     },
     {
       tableName: "settings",
-      timestamps: false,
+      timestamps: true,
       underscored: true,
     },
   );
 
   Settings.associate = (models) => {
     Settings.belongsTo(models.User, {
-      foreignKey: "discord_user_id",
+      foreignKey: "user_id",
       as: "user",
       onDelete: "CASCADE",
     });

@@ -9,13 +9,13 @@ export default (sequelize, Sequelize) => {
         primaryKey: true,
         autoIncrement: true,
       },
-      discordUserId: {
-        type: DataTypes.STRING,
+      userId: {
+        type: DataTypes.UUID,
         allowNull: false,
-        field: "discord_user_id",
+        field: "user_id",
         references: {
           model: "users",
-          key: "discord_user_id",
+          key: "id",
         },
       },
       title: {
@@ -50,7 +50,7 @@ export default (sequelize, Sequelize) => {
       underscored: true,
       indexes: [
         {
-          fields: ["discord_user_id", "status"],
+          fields: ["user_id", "status"],
           name: "ix__tasks__user_status",
         },
       ],
@@ -59,7 +59,7 @@ export default (sequelize, Sequelize) => {
 
   Task.associate = (models) => {
     Task.belongsTo(models.User, {
-      foreignKey: "discord_user_id",
+      foreignKey: "user_id",
       as: "user",
     });
 
