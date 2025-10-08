@@ -44,4 +44,7 @@ await addJobs(client);
 
 // Log in bot
 await client.login(TOKEN);
-console.log("✓ Bot is online.");
+
+client.once("ready", (readyClient) => {
+  console.log(`Ready! Logged in as ${readyClient.user.tag}`);
+});
