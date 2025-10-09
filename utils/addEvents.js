@@ -6,9 +6,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const addEvents = async (client) => {
-  const eventFiles = fs.readdirSync(path.join(__dirname, "./events"));
+  const eventFiles = fs.readdirSync(path.join(__dirname, "../events"));
   for (const file of eventFiles) {
-    const event = await import(`./events/${file}`);
+    const event = await import(`../events/${file}`);
     const eventModule = event.default ?? event;
     if (!eventModule.name || typeof eventModule.execute !== "function") {
       console.warn(`Skipped event ${file}: missing name/execute`);

@@ -1,12 +1,19 @@
+# Environment mode
+NODE_ENV=development
+
+# Discord
 token= ""
 statusChannelId= ""
 chatSummaryChannelId= ""
 clientId= ""
 guildId= "" 
 sourceChannelIds= []
+
+# AI / Ollama
 ollamaUrl= "https://juno-ollama.fly.dev"
 ollamaModel= "tinyllama"
 
+# Database
 HOST=localhost
 DATABASE_NAME=juno_time_dev
 ADMIN_USERNAME=admin
