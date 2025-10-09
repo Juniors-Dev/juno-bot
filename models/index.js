@@ -20,7 +20,11 @@ const sequelize = new Sequelize(
     logging: false,
     dialectOptions: {
       decimalNumbers: true,
-      // ssl config here if needed
+      // Uncomment the following lines if you need to use SSL to connect to your database
+      // ssl: {
+      //   require: process.env.SSL || true,
+      //   rejectUnauthorized: process.env.DB_REJECT_UNAUTHORIZED || false,
+      // },
     },
   },
 );
