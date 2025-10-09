@@ -23,10 +23,10 @@ const sequelize = new Sequelize(
     dialectOptions: {
       decimalNumbers: true,
       // Uncomment the following lines if you need to use SSL to connect to your database
-      ssl: {
-        require: process.env.SSL || true,
-        rejectUnauthorized: process.env.DB_REJECT_UNAUTHORIZED || false,
-      },
+      // ssl: {
+      //   require: process.env.SSL || true,
+      //   rejectUnauthorized: process.env.DB_REJECT_UNAUTHORIZED || false,
+      // },
     },
   },
 );

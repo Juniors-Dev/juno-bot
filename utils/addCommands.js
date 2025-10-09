@@ -1,7 +1,6 @@
-// utils/addCommands.js
 import fs from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
+import { fileURLToPath, pathToFileURL } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -13,10 +12,9 @@ async function loadCommandsFromDir(client, dir) {
     const fullPath = path.join(dir, entry.name);
 
     if (entry.isDirectory()) {
-      // recurse into subfolder
       await loadCommandsFromDir(client, fullPath);
     } else if (entry.isFile() && entry.name.endsWith(".js")) {
-      const mod = await import(fullPath);
+      const mod = await import(pathToFileURL(fullPath).href);
       const command = mod.default ?? mod;
       if (!command?.data?.name || typeof command.execute !== "function") {
         console.warn(`⚠️ Skipped ${fullPath} (missing data.name/execute)`);
