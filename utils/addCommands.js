@@ -21,6 +21,7 @@ async function loadCommandsFromDir(client, dir) {
         continue;
       }
       client.commands.set(command.data.name, command);
+      console.log(`✅ ${fullPath} Successfully Added`);
     }
   }
 }
