@@ -1,15 +1,13 @@
 import Sequelize from "sequelize";
 import fs from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
+import { fileURLToPath, pathToFileURL } from "url";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-// recreate __dirname in ESM
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
 const basename = path.basename(__filename);
 
 const sequelize = new Sequelize(
@@ -19,14 +17,14 @@ const sequelize = new Sequelize(
   {
     host: process.env.HOST,
     dialect: process.env.DIALECT,
-    logging: false, // Disable logging for production
+    logging: false,
     dialectOptions: {
       decimalNumbers: true,
       // Uncomment the following lines if you need to use SSL to connect to your database
-      ssl: {
-        require: process.env.SSL || true,
-        rejectUnauthorized: process.env.DB_REJECT_UNAUTHORIZED || false,
-      },
+      // ssl: {
+      //   require: process.env.SSL || true,
+      //   rejectUnauthorized: process.env.DB_REJECT_UNAUTHORIZED || false,
+      // },
     },
   },
 );
@@ -37,11 +35,13 @@ async function createDatabase(options) {
 
   const files = fs
     .readdirSync(__dirname)
-    .filter((file) => file.indexOf(".") !== 0 && file !== basename && file.slice(-3) === ".js");
+    .filter((file) => file.indexOf(".") !== 0 && file !== basename && file.endsWith(".js"));
 
   const models = await Promise.all(
     files.map(async (file) => {
-      const model = (await import(path.join(__dirname, file))).default(options, Sequelize);
+      const filePath = path.join(__dirname, file);
+      const mod = await import(pathToFileURL(filePath).href);
+      const model = mod.default(options, Sequelize);
       return model;
     }),
   );
@@ -50,11 +50,11 @@ async function createDatabase(options) {
     db[model.name] = model;
   }
 
-  Object.keys(db).forEach((modelName) => {
-    if (db[modelName].associate) {
-      db[modelName].associate(db);
+  for (const name of Object.keys(db)) {
+    if (typeof db[name].associate === "function") {
+      db[name].associate(db);
     }
-  });
+  }
 
   return db;
 }
