@@ -40,11 +40,11 @@ if (process.env.NODE_ENV !== "production") {
 console.log("Loading bot components...");
 await addCommands(client);
 await addEvents(client);
-await addJobs(client);
 
 // Log in bot
 await client.login(TOKEN);
 
 client.once("ready", (readyClient) => {
   console.log(`Ready! Logged in as ${readyClient.user.tag}`);
+  addJobs(client);
 });
