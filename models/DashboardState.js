@@ -21,6 +21,14 @@ export default (sequelize, Sequelize) => {
         field: "message_id",
         comment: "Discord message ID for the dashboard",
       },
+      kind: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: "whos_working",
+        validate: {
+          isIn: [["whos_working", "projects"]],
+        },
+      },
     },
     {
       tableName: "live_dashboard",
@@ -29,8 +37,8 @@ export default (sequelize, Sequelize) => {
       indexes: [
         {
           unique: true,
-          fields: ["channel_id"],
-          name: "uq__live_dashboard__channel_id",
+          fields: ["channel_id", "kind"],
+          name: "uq__live_dashboard__channel_kind",
         },
       ],
     },
