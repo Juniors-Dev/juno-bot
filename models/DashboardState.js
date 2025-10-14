@@ -24,9 +24,9 @@ export default (sequelize, Sequelize) => {
       kind: {
         type: DataTypes.STRING,
         allowNull: false,
-        defaultValue: "whos_working",
+        defaultValue: "main",
         validate: {
-          isIn: [["whos_working", "projects"]],
+          isIn: [["main", "projects"]],
         },
       },
     },
