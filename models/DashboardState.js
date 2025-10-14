@@ -26,7 +26,7 @@ export default (sequelize, Sequelize) => {
         allowNull: false,
         defaultValue: "main",
         validate: {
-          isIn: [["main", "projects"]],
+          isIn: [ALL_KINDS],
         },
       },
     },
@@ -37,8 +37,13 @@ export default (sequelize, Sequelize) => {
       indexes: [
         {
           unique: true,
-          fields: ["channel_id", "kind"],
-          name: "uq__live_dashboard__channel_id_kind",
+          fields: ["kind"],
+          name: "uq_dashboard_kind",
+        },
+        { 
+          unique: true, 
+          fields: ["message_id"], 
+          name: "uq_dashboard_message"
         },
       ],
     },
