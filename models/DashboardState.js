@@ -38,7 +38,7 @@ export default (sequelize, Sequelize) => {
         {
           unique: true,
           fields: ["channel_id", "kind"],
-          name: "uq__live_dashboard__channel_kind",
+          name: "uq__live_dashboard__channel_id_kind",
         },
       ],
     },
