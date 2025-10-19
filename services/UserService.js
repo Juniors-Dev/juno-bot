@@ -1,4 +1,4 @@
-class UserService {
+export default class UserService {
   constructor(db) {
     this.client = db.sequelize;
     this.User = db.User;
