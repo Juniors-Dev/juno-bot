@@ -46,38 +46,38 @@ export default (sequelize, Sequelize) => {
   Project.associate = (models) => {
     Project.belongsToMany(models.User, {
       through: models.ProjectMember,
-      foreignKey: "project_id",
-      otherKey: "user_id",
+      foreignKey: "projectId",
+      otherKey: "userId",
       as: "members",
     });
 
     Project.belongsToMany(models.Session, {
       through: models.SessionProject,
-      foreignKey: "project_id",
-      otherKey: "session_id",
+      foreignKey: "projectId",
+      otherKey: "sessionId",
       as: "sessions",
     });
 
     Project.hasMany(models.ProjectMember, {
-      foreignKey: "project_id",
+      foreignKey: "projectId",
       as: "projectMembers",
       onDelete: "CASCADE",
     });
 
     Project.hasMany(models.Link, {
-      foreignKey: "project_id",
+      foreignKey: "projectId",
       as: "links",
       onDelete: "CASCADE",
     });
 
     Project.hasMany(models.SessionProject, {
-      foreignKey: "project_id",
+      foreignKey: "projectId",
       as: "sessionProjects",
       onDelete: "CASCADE",
     });
 
     Project.hasMany(models.Task, {
-      foreignKey: "project_id",
+      foreignKey: "projectId",
       as: "tasks",
     });
   };

@@ -56,11 +56,11 @@ export default (sequelize, Sequelize) => {
       underscored: true,
       indexes: [
         {
-          fields: ["user_id", "status"],
+          fields: ["userId", "status"],
           name: "ix__tasks__user_status",
         },
         {
-          fields: ["project_id", "status"],
+          fields: ["projectId", "status"],
           name: "ix__tasks__project_status",
         },
       ],
@@ -69,26 +69,26 @@ export default (sequelize, Sequelize) => {
 
   Task.associate = (models) => {
     Task.belongsTo(models.User, {
-      foreignKey: "user_id",
+      foreignKey: "userId",
       as: "user",
       onDelete: "CASCADE",
     });
 
     Task.belongsTo(models.Project, {
-      foreignKey: "project_id",
+      foreignKey: "projectId",
       as: "project",
       onDelete: "CASCADE",
     });
 
     Task.belongsToMany(models.Session, {
       through: models.SessionTask,
-      foreignKey: "task_id",
-      otherKey: "session_id",
+      foreignKey: "taskId",
+      otherKey: "sessionId",
       as: "sessions",
     });
 
     Task.hasMany(models.SessionTask, {
-      foreignKey: "task_id",
+      foreignKey: "taskId",
       as: "sessionTasks",
       onDelete: "CASCADE",
     });

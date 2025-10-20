@@ -43,11 +43,11 @@ export default (sequelize, Sequelize) => {
       indexes: [
         {
           unique: true,
-          fields: ["project_id", "url"],
+          fields: ["projectId", "url"],
           name: "uq__links__project_id_url",
         },
         {
-          fields: ["project_id"],
+          fields: ["projectId"],
           name: "ix__links__project_id",
         },
       ],
@@ -56,7 +56,7 @@ export default (sequelize, Sequelize) => {
 
   Link.associate = (models) => {
     Link.belongsTo(models.Project, {
-      foreignKey: "project_id",
+      foreignKey: "projectId",
       as: "project",
       onDelete: "CASCADE",
     });
