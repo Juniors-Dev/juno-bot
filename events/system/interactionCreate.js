@@ -1,4 +1,4 @@
-import { Events } from "discord.js";
+import { Events, ActionRowBuilder, ButtonStyle, ButtonBuilder, MessageFlags } from "discord.js";
 
 export default {
   name: Events.InteractionCreate,
@@ -12,6 +12,23 @@ export default {
     }
 
     try {
+      const { userService } = interaction.services;
+      const isUser = await userService.getOneDiscordId(interaction.user.id);
+      if (!isUser) {
+        await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+        const button = new ButtonBuilder()
+          .setCustomId("create_user_modal_button")
+          .setLabel("Create User")
+          .setStyle(ButtonStyle.Primary);
+
+        const row = new ActionRowBuilder().addComponents(button);
+
+        return interaction.editReply({
+          content: "You’re not in the database yet. Click below to create a profile.",
+          components: [row],
+        });
+      }
+
       await command.execute(interaction);
     } catch (error) {
       console.error(error);
