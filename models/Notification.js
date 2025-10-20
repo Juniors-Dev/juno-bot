@@ -104,11 +104,11 @@ export default (sequelize, Sequelize) => {
       underscored: true,
       indexes: [
         {
-          fields: ["userId", "sendAt"],
+          fields: ["user_id", "send_at"],
           name: "ix__notifications__user_sendat",
         },
         {
-          fields: ["scheduleCron"],
+          fields: ["schedule_cron"],
           where: { is_active: true },
           name: "ix__notifications__cron__active",
         },

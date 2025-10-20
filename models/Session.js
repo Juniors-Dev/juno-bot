@@ -55,12 +55,12 @@ export default (sequelize, Sequelize) => {
       indexes: [
         {
           unique: true,
-          fields: ["userId"],
-          where: { endedAt: null },
+          fields: ["user_id"],
+          where: { ended_At: null },
           name: "uq__sessions__user_id__ended_at_null",
         },
         {
-          fields: ["userId", "startedAt"],
+          fields: ["user_id", "started_at"],
           name: "ix__sessions__user_started_at",
         },
       ],

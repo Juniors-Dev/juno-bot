@@ -45,15 +45,15 @@ export default (sequelize, Sequelize) => {
       indexes: [
         {
           unique: true,
-          fields: ["sessionId", "taskId"],
+          fields: ["session_id", "task_id"],
           name: "uq__session_tasks__session_id_task_id",
         },
         {
-          fields: ["taskId"],
+          fields: ["task_id"],
           name: "ix__session_tasks__task_id",
         },
         {
-          fields: ["sessionId"],
+          fields: ["session_id"],
           name: "ix__session_tasks__session_id",
         },
       ],

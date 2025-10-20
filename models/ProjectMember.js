@@ -58,11 +58,11 @@ export default (sequelize, Sequelize) => {
       indexes: [
         {
           unique: true,
-          fields: ["projectId", "userId"],
+          fields: ["project_id", "user_id"],
           name: "uq__project_members__project_id_user_id",
         },
         {
-          fields: ["projectId", "isAdmin"],
+          fields: ["project_id", "is_admin"],
           name: "ix__project_members__project_id_is_admin",
         },
       ],

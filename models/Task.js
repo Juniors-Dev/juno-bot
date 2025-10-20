@@ -56,11 +56,11 @@ export default (sequelize, Sequelize) => {
       underscored: true,
       indexes: [
         {
-          fields: ["userId", "status"],
+          fields: ["user_id", "status"],
           name: "ix__tasks__user_status",
         },
         {
-          fields: ["projectId", "status"],
+          fields: ["project_id", "status"],
           name: "ix__tasks__project_status",
         },
       ],
