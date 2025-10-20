@@ -7,7 +7,7 @@ export default class SessionService {
   }
 
   /**
-   * Get user's active session by internal userId.
+   * Get user's active session by userId.
    * @param {string} userId - Internal user UUID
    * @param {Object} [options]
    * @param {boolean} [options.includeUser=false] - Include user details in response
