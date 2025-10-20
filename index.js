@@ -1,10 +1,11 @@
-import { Client, GatewayIntentBits, Collection } from "discord.js";
+import { Client, GatewayIntentBits, Collection, Events } from "discord.js";
 import addCommands from "./utils/addCommands.js";
 import addEvents from "./utils/addEvents.js";
 import { required } from "./utils/envHelpers.js";
 // import { required, parseIds } from "./utils/envHelpers.js";
 import addJobs from "./utils/addJobs.js";
 import { adminDb } from "./models/index.js";
+import services from "./services/index.js";
 
 // ---- Read ENV ----
 const TOKEN = required("token");
@@ -35,6 +36,11 @@ if (process.env.NODE_ENV !== "production") {
   await adminDb.sequelize.sync({ alter: true });
   console.log("✓ Database synced.");
 }
+
+// Attach services to interactions for calling on interaction.services[service]
+client.prependListener(Events.InteractionCreate, (interaction) => {
+  interaction.services = services;
+});
 
 // Load commands, events & add cron jobs
 console.log("Loading bot components...");
