@@ -29,6 +29,26 @@ export default class SessionService {
   }
 
   /**
+   * Get user's active session by Discord ID.
+   * @param {string} discordId - Discord snowflake ID
+   * @returns {Promise<Object|null>} Active session with user data, or null if none exists
+   */
+  async getOneActiveByDiscordId(discordId) {
+    return this.Session.findOne({
+      where: { endedAt: null },
+      include: [
+        {
+          model: this.User,
+          as: "user",
+          where: { discordId },
+          attributes: ["id", "discordId", "name"],
+          required: true,
+        },
+      ],
+    });
+  }
+
+  /**
    * Get session by session ID.
    * @param {string} sessionId - Session UUID
    * @param {Object} [options]
