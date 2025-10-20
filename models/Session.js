@@ -36,7 +36,11 @@ export default (sequelize, Sequelize) => {
       targetDurationMinutes: {
         type: DataTypes.INTEGER,
         field: "target_duration_minutes",
-        comment: "User intended session length",
+        comment: "Optional user intended session length",
+        validate: {
+          min: 1,
+          max: 480,
+        },
       },
       autoEnded: {
         type: DataTypes.BOOLEAN,
@@ -51,12 +55,12 @@ export default (sequelize, Sequelize) => {
       indexes: [
         {
           unique: true,
-          fields: ["user_id"],
-          where: { ended_at: null },
+          fields: ["userId"],
+          where: { endedAt: null },
           name: "uq__sessions__user_id__ended_at_null",
         },
         {
-          fields: ["user_id", "started_at"],
+          fields: ["userId", "startedAt"],
           name: "ix__sessions__user_started_at",
         },
       ],
@@ -65,39 +69,39 @@ export default (sequelize, Sequelize) => {
 
   Session.associate = (models) => {
     Session.belongsTo(models.User, {
-      foreignKey: "user_id",
+      foreignKey: "userId",
       as: "user",
       onDelete: "CASCADE",
     });
 
     Session.belongsToMany(models.Project, {
       through: models.SessionProject,
-      foreignKey: "session_id",
-      otherKey: "project_id",
+      foreignKey: "sessionId",
+      otherKey: "projectId",
       as: "projects",
     });
 
     Session.belongsToMany(models.Task, {
       through: models.SessionTask,
-      foreignKey: "session_id",
-      otherKey: "task_id",
+      foreignKey: "sessionId",
+      otherKey: "taskId",
       as: "tasks",
     });
 
     Session.hasMany(models.SessionProject, {
-      foreignKey: "session_id",
+      foreignKey: "sessionId",
       as: "sessionProjects",
       onDelete: "CASCADE",
     });
 
     Session.hasMany(models.SessionTask, {
-      foreignKey: "session_id",
+      foreignKey: "sessionId",
       as: "sessionTasks",
       onDelete: "CASCADE",
     });
 
     Session.hasMany(models.Notification, {
-      foreignKey: "session_id",
+      foreignKey: "sessionId",
       as: "notifications",
       onDelete: "CASCADE",
     });
