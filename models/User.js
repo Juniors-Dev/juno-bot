@@ -37,12 +37,12 @@ export default (sequelize, Sequelize) => {
       indexes: [
         {
           unique: true,
-          fields: ["discord_id"],
+          fields: ["discordId"],
           name: "uq__users__discord_id",
         },
         {
           unique: true,
-          fields: ["github_username"],
+          fields: ["githubUsername"],
           name: "uq__users__github_username",
         },
       ],
@@ -52,37 +52,37 @@ export default (sequelize, Sequelize) => {
   User.associate = (models) => {
     User.belongsToMany(models.Project, {
       through: models.ProjectMember,
-      foreignKey: "user_id",
-      otherKey: "project_id",
+      foreignKey: "userId",
+      otherKey: "projectId",
       as: "projects",
     });
 
     User.hasOne(models.Settings, {
-      foreignKey: "user_id",
+      foreignKey: "userId",
       as: "settings",
       onDelete: "CASCADE",
     });
 
     User.hasMany(models.ProjectMember, {
-      foreignKey: "user_id",
+      foreignKey: "userId",
       as: "projectMembers",
       onDelete: "CASCADE",
     });
 
     User.hasMany(models.Session, {
-      foreignKey: "user_id",
+      foreignKey: "userId",
       as: "sessions",
       onDelete: "CASCADE",
     });
 
     User.hasMany(models.Task, {
-      foreignKey: "user_id",
+      foreignKey: "userId",
       as: "tasks",
       onDelete: "CASCADE",
     });
 
     User.hasMany(models.Notification, {
-      foreignKey: "user_id",
+      foreignKey: "userId",
       as: "notifications",
       onDelete: "CASCADE",
     });

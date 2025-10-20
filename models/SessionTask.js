@@ -45,15 +45,15 @@ export default (sequelize, Sequelize) => {
       indexes: [
         {
           unique: true,
-          fields: ["session_id", "task_id"],
+          fields: ["sessionId", "taskId"],
           name: "uq__session_tasks__session_id_task_id",
         },
         {
-          fields: ["task_id"],
+          fields: ["taskId"],
           name: "ix__session_tasks__task_id",
         },
         {
-          fields: ["session_id"],
+          fields: ["sessionId"],
           name: "ix__session_tasks__session_id",
         },
       ],
@@ -62,13 +62,13 @@ export default (sequelize, Sequelize) => {
 
   SessionTask.associate = (models) => {
     SessionTask.belongsTo(models.Session, {
-      foreignKey: "session_id",
+      foreignKey: "sessionId",
       as: "session",
       onDelete: "CASCADE",
     });
 
     SessionTask.belongsTo(models.Task, {
-      foreignKey: "task_id",
+      foreignKey: "taskId",
       as: "task",
       onDelete: "CASCADE",
     });

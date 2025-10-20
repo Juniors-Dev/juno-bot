@@ -28,7 +28,7 @@ export default (sequelize, Sequelize) => {
 
   Settings.associate = (models) => {
     Settings.belongsTo(models.User, {
-      foreignKey: "user_id",
+      foreignKey: "userId",
       as: "user",
       onDelete: "CASCADE",
     });

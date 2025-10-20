@@ -39,19 +39,19 @@ export default (sequelize, Sequelize) => {
       indexes: [
         {
           unique: true,
-          fields: ["session_id", "project_id"],
+          fields: ["sessionId", "projectId"],
           name: "uq__session_projects__session_id_project_id",
         },
         {
-          fields: ["project_id"],
+          fields: ["projectId"],
           name: "ix__session_projects__project_id",
         },
         {
-          fields: ["session_id"],
+          fields: ["sessionId"],
           name: "ix__session_projects__session_id",
         },
         {
-          fields: ["project_id", "updated_at"],
+          fields: ["projectId", "updatedAt"],
           name: "ix__session_projects__project_recent",
         },
       ],
@@ -60,13 +60,13 @@ export default (sequelize, Sequelize) => {
 
   SessionProject.associate = (models) => {
     SessionProject.belongsTo(models.Session, {
-      foreignKey: "session_id",
+      foreignKey: "sessionId",
       as: "session",
       onDelete: "CASCADE",
     });
 
     SessionProject.belongsTo(models.Project, {
-      foreignKey: "project_id",
+      foreignKey: "projectId",
       as: "project",
       onDelete: "CASCADE",
     });

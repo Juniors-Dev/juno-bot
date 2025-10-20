@@ -58,11 +58,11 @@ export default (sequelize, Sequelize) => {
       indexes: [
         {
           unique: true,
-          fields: ["project_id", "user_id"],
+          fields: ["projectId", "userId"],
           name: "uq__project_members__project_id_user_id",
         },
         {
-          fields: ["project_id", "is_admin"],
+          fields: ["projectId", "isAdmin"],
           name: "ix__project_members__project_id_is_admin",
         },
       ],
@@ -71,12 +71,12 @@ export default (sequelize, Sequelize) => {
 
   ProjectMember.associate = (models) => {
     ProjectMember.belongsTo(models.Project, {
-      foreignKey: "project_id",
+      foreignKey: "projectId",
       as: "project",
     });
 
     ProjectMember.belongsTo(models.User, {
-      foreignKey: "user_id",
+      foreignKey: "userId",
       as: "user",
     });
   };

@@ -104,11 +104,11 @@ export default (sequelize, Sequelize) => {
       underscored: true,
       indexes: [
         {
-          fields: ["user_id", "send_at"],
+          fields: ["userId", "sendAt"],
           name: "ix__notifications__user_sendat",
         },
         {
-          fields: ["schedule_cron"],
+          fields: ["scheduleCron"],
           where: { is_active: true },
           name: "ix__notifications__cron__active",
         },
@@ -118,19 +118,19 @@ export default (sequelize, Sequelize) => {
 
   Notification.associate = (models) => {
     Notification.belongsTo(models.User, {
-      foreignKey: "user_id",
+      foreignKey: "userId",
       as: "user",
       onDelete: "CASCADE",
     });
 
     Notification.belongsTo(models.Project, {
-      foreignKey: "project_id",
+      foreignKey: "projectId",
       as: "project",
       constraints: false,
     });
 
     Notification.belongsTo(models.Session, {
-      foreignKey: "session_id",
+      foreignKey: "sessionId",
       as: "session",
       constraints: false,
       onDelete: "CASCADE",
