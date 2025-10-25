@@ -1,4 +1,5 @@
 import { Events, ActionRowBuilder, ButtonStyle, ButtonBuilder, MessageFlags } from "discord.js";
+import { guardMap } from "../../guards/index.js";
 
 export default {
   name: Events.InteractionCreate,
@@ -27,6 +28,24 @@ export default {
           content: "You’re not in the database yet. Click below to create a profile.",
           components: [row],
         });
+      }
+
+      if (command.guards?.length) {
+        for (const guardName of command.guards) {
+          const guard = guardMap[guardName];
+
+          if (!guard) {
+            console.error(`Unknown guard: ${guardName}`);
+            await interaction.reply({
+              content: "Configuration error.",
+              flags: MessageFlags.Ephemeral,
+            });
+            return;
+          }
+
+          const passed = await guard(interaction);
+          if (!passed) return;
+        }
       }
 
       await command.execute(interaction);
