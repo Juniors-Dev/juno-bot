@@ -56,7 +56,7 @@ export default (sequelize, Sequelize) => {
         {
           unique: true,
           fields: ["user_id"],
-          where: { ended_At: null },
+          where: { ended_at: null },
           name: "uq__sessions__user_id__ended_at_null",
         },
         {
