@@ -37,12 +37,12 @@ export default (sequelize, Sequelize) => {
       indexes: [
         {
           unique: true,
-          fields: ["discordId"],
+          fields: ["discord_id"],
           name: "uq__users__discord_id",
         },
         {
           unique: true,
-          fields: ["githubUsername"],
+          fields: ["github_username"],
           name: "uq__users__github_username",
         },
       ],

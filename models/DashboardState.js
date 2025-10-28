@@ -29,7 +29,7 @@ export default (sequelize, Sequelize) => {
       indexes: [
         {
           unique: true,
-          fields: ["channelId"],
+          fields: ["channel_id"],
           name: "uq__live_dashboard__channel_id",
         },
       ],

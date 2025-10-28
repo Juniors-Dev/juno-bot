@@ -39,19 +39,19 @@ export default (sequelize, Sequelize) => {
       indexes: [
         {
           unique: true,
-          fields: ["sessionId", "projectId"],
+          fields: ["session_id", "project_id"],
           name: "uq__session_projects__session_id_project_id",
         },
         {
-          fields: ["projectId"],
+          fields: ["project_id"],
           name: "ix__session_projects__project_id",
         },
         {
-          fields: ["sessionId"],
+          fields: ["session_id"],
           name: "ix__session_projects__session_id",
         },
         {
-          fields: ["projectId", "updatedAt"],
+          fields: ["project_id", "updated_at"],
           name: "ix__session_projects__project_recent",
         },
       ],
