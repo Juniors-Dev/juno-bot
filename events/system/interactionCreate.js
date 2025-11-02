@@ -1,5 +1,5 @@
 import { Events, ActionRowBuilder, ButtonStyle, ButtonBuilder, MessageFlags } from "discord.js";
-import { guardMap } from "../../guards/index.js";
+import { replyEphemeral } from "../../utils/respond.js";
 
 export default {
   name: Events.InteractionCreate,
@@ -13,9 +13,9 @@ export default {
     }
 
     try {
-      const { userService } = interaction.services;
-      const isUser = await userService.getOneDiscordId(interaction.user.id);
-      if (!isUser) {
+      const { userService, sessionService } = interaction.services;
+      const dbUser = await userService.getOneDiscordId(interaction.user.id);
+      if (!dbUser) {
         await interaction.deferReply({ flags: MessageFlags.Ephemeral });
         const button = new ButtonBuilder()
           .setCustomId("create_user_modal_button")
@@ -30,19 +30,11 @@ export default {
         });
       }
 
+      interaction.dbUser = dbUser;
+      interaction.activeSession = await sessionService.getOneActive(dbUser.id);
+
       if (command.guards?.length) {
-        for (const guardName of command.guards) {
-          const guard = guardMap[guardName];
-
-          if (!guard) {
-            console.error(`Unknown guard: ${guardName}`);
-            await interaction.reply({
-              content: "Configuration error.",
-              flags: MessageFlags.Ephemeral,
-            });
-            return;
-          }
-
+        for (const guard of command.guards) {
           const passed = await guard(interaction);
           if (!passed) return;
         }
@@ -50,12 +42,8 @@ export default {
 
       await command.execute(interaction);
     } catch (error) {
-      console.error(error);
-      if (interaction.deferred || interaction.replied) {
-        await interaction.editReply("Something broke.");
-      } else {
-        await interaction.reply({ content: "Something broke.", ephemeral: true });
-      }
+      console.error("interactionCreate error:", error);
+      await replyEphemeral(interaction, "Something broke.");
     }
   },
 };
