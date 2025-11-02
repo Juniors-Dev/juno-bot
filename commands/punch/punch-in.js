@@ -1,5 +1,6 @@
 import { SlashCommandBuilder, MessageFlags } from "discord.js";
 import { discordTs } from "../../utils/time.js";
+import { requireNoActiveSession } from "../../guards/index.js";
 
 export default {
   data: new SlashCommandBuilder()
@@ -12,22 +13,17 @@ export default {
         .setRequired(false),
     ),
 
-  guards: ["noSession"],
+  guards: [requireNoActiveSession],
 
   async execute(interaction) {
     await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
     try {
-      const { sessionService, userService } = interaction.services;
+      const { sessionService } = interaction.services;
+      const user = interaction.dbUser;
 
-      const dbUser = await userService.getOneDiscordId(interaction.user.id);
       const activity = interaction.options.getString("status")?.trim() || null;
-      const session = await sessionService.start(dbUser.id, { activity });
-
-      if (!session) {
-        return interaction.editReply("You're already clocked in. Use `/clock-out` first.");
-      }
-
+      const session = await sessionService.start(user.id, { activity });
       const timestamp = discordTs(session.startedAt, "t");
       const activityText = activity ? `\nWorking on: ${activity}` : "";
 
