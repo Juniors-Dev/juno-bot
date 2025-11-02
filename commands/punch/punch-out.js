@@ -1,25 +1,22 @@
 import { SlashCommandBuilder, MessageFlags } from "discord.js";
 import { formatDurationMs, discordTs } from "../../utils/time.js";
+import { requireActiveSession } from "../../guards/index.js";
 
 export default {
   data: new SlashCommandBuilder()
     .setName("clock-out")
     .setDescription("End your current work session"),
 
-  guards: ["activeSession"],
+  guards: [requireActiveSession],
 
   async execute(interaction) {
     await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
     try {
       const { sessionService } = interaction.services;
-      const { dbUser } = interaction;
+      const userId = interaction.dbUser.id;
 
-      const result = await sessionService.end(dbUser.id);
-      if (!result) {
-        return interaction.editReply("You're not clocked in. Use `/clock-in` first.");
-      }
-
+      const result = await sessionService.end(userId);
       const { session, durationMs } = result;
 
       const started = discordTs(session.startedAt, "t");
@@ -33,7 +30,6 @@ export default {
           `Ended: ${ended}\n` +
           `Duration: ${durationText}${activityText}`,
       );
-
       // TODO: Update dashboard
     } catch (err) {
       console.error("Clock-out error:", err);
