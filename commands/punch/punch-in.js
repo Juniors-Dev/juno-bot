@@ -20,10 +20,10 @@ export default {
 
     try {
       const { sessionService } = interaction.services;
-      const user = interaction.dbUser;
+      const userId = interaction.dbUser.id;
 
       const activity = interaction.options.getString("status")?.trim() || null;
-      const session = await sessionService.start(user.id, { activity });
+      const session = await sessionService.start(userId, { activity });
       const timestamp = discordTs(session.startedAt, "t");
       const activityText = activity ? `\nWorking on: ${activity}` : "";
 
