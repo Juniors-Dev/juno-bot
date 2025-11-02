@@ -1,13 +1,8 @@
-import hasSession from "./hasSession.js";
-import { MessageFlags } from "discord.js";
+import { replyEphemeral } from "../utils/respond.js";
 
 export async function requireNoActiveSession(interaction) {
-  if (await hasSession(interaction)) {
-    await interaction.reply({
-      content: "You're already clocked in. Use `/clock-out` first.",
-      flags: MessageFlags.Ephemeral,
-    });
-    return false;
-  }
-  return true;
+  if (!interaction.activeSession) return true;
+  //TODO: Add clock out button
+  await replyEphemeral(interaction, "You're already clocked in. Use `/clock-out` first.");
+  return false;
 }
