@@ -8,7 +8,7 @@ export default {
     .setDescription("Start tracking your work session")
     .addStringOption((option) =>
       option
-        .setName("status")
+        .setName("activity")
         .setDescription("What are you working on? (optional)")
         .setRequired(false),
     ),
@@ -21,7 +21,7 @@ export default {
       const { sessionService } = interaction.services;
       const { user } = interaction.context;
 
-      const activity = interaction.options.getString("status")?.trim() || null;
+      const activity = interaction.options.getString("activity")?.trim() || null;
       const session = await sessionService.start(user.id, { activity });
       if (!session)
         return interaction.editReply("You're already clocked in. Use `/clock-out` first.");
