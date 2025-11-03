@@ -1,5 +1,5 @@
 import { Events, ActionRowBuilder, ButtonStyle, ButtonBuilder, MessageFlags } from "discord.js";
-import { replyEphemeral } from "../../utils/respond.js";
+import { replyEphemeral } from "../../utils/reply.js";
 
 export default {
   name: Events.InteractionCreate,

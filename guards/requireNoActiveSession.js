@@ -1,4 +1,4 @@
-import { replyEphemeral } from "../utils/respond.js";
+import { replyEphemeral } from "../utils/reply.js";
 
 export async function requireNoActiveSession(interaction) {
   if (!interaction.activeSession) return true;
