@@ -12,7 +12,6 @@ export default {
         .setDescription("What are you working on? (optional)")
         .setRequired(false),
     ),
-
   guards: [requireNoActiveSession],
 
   async execute(interaction) {
@@ -20,15 +19,16 @@ export default {
 
     try {
       const { sessionService } = interaction.services;
-      const userId = interaction.dbUser.id;
+      const { user } = interaction.context;
 
       const activity = interaction.options.getString("status")?.trim() || null;
-      const session = await sessionService.start(userId, { activity });
-      const timestamp = discordTs(session.startedAt, "t");
+      const session = await sessionService.start(user.id, { activity });
+      if (!session)
+        return interaction.editReply("You're already clocked in. Use `/clock-out` first.");
+
+      const started = discordTs(session.startedAt, "t");
       const activityText = activity ? `\nWorking on: ${activity}` : "";
-
-      await interaction.editReply(`✅ **Clocked in!**\nStarted: ${timestamp}${activityText}`);
-
+      await interaction.editReply(`✅ **Clocked in!**\nStarted: ${started}${activityText}`);
       // TODO: Update dashboard
     } catch (err) {
       console.error("Clock-in error:", err);
