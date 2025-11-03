@@ -6,7 +6,6 @@ export default {
   data: new SlashCommandBuilder()
     .setName("clock-out")
     .setDescription("End your current work session"),
-
   guards: [requireActiveSession],
 
   async execute(interaction) {
@@ -14,11 +13,12 @@ export default {
 
     try {
       const { sessionService } = interaction.services;
-      const userId = interaction.dbUser.id;
+      const { user } = interaction.context;
 
-      const result = await sessionService.end(userId);
+      const result = await sessionService.end(user.id);
+      if (!result) return interaction.editReply("You're not clocked in. Use `/clock-in` first.");
+
       const { session, durationMs } = result;
-
       const started = discordTs(session.startedAt, "t");
       const ended = discordTs(session.endedAt, "t");
       const durationText = formatDurationMs(durationMs, { mode: "round" });
