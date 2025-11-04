@@ -1,5 +1,4 @@
-import { SlashCommandBuilder, MessageFlags } from "discord.js";
-import { discordTs } from "../../utils/time.js";
+import { SlashCommandBuilder, MessageFlags, time, TimestampStyles } from "discord.js";
 import { requireNoActiveSession } from "../../guards/index.js";
 
 export default {
@@ -26,7 +25,7 @@ export default {
       if (!session)
         return interaction.editReply("You're already clocked in. Use `/clock-out` first.");
 
-      const started = discordTs(session.startedAt, "t");
+      const started = time(session.startedAt, TimestampStyles.ShortTime);
       const activityText = activity ? `\nWorking on: ${activity}` : "";
       await interaction.editReply(`✅ **Clocked in!**\nStarted: ${started}${activityText}`);
       // TODO: Update dashboard

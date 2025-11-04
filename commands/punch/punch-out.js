@@ -1,5 +1,5 @@
-import { SlashCommandBuilder, MessageFlags } from "discord.js";
-import { formatDurationMs, discordTs } from "../../utils/time.js";
+import { SlashCommandBuilder, MessageFlags, time, TimestampStyles } from "discord.js";
+import { formatDurationMs } from "../../utils/formatTime.js";
 import { requireActiveSession } from "../../guards/index.js";
 
 export default {
@@ -19,8 +19,8 @@ export default {
       if (!result) return interaction.editReply("You're not clocked in. Use `/clock-in` first.");
 
       const { session, durationMs } = result;
-      const started = discordTs(session.startedAt, "t");
-      const ended = discordTs(session.endedAt, "t");
+      const started = time(session.startedAt, TimestampStyles.ShortTime);
+      const ended = time(session.endedAt, TimestampStyles.ShortTime);
       const durationText = formatDurationMs(durationMs, { mode: "round" });
       const activityText = session.activity ? `\nWorked on: ${session.activity}` : "";
 

@@ -14,9 +14,3 @@ export function formatMinutesHm(totalMinutes) {
 export function formatDurationMs(ms, opts = {}) {
   return formatMinutesHm(minutesFromMs(ms, opts.mode ?? "round"));
 }
-
-// Discord timestamp styles: 't','T','d','D','f','F','R'
-export function discordTs(input, style = "t") {
-  const d = input instanceof Date ? input : new Date(input);
-  return `<t:${Math.floor(d.getTime() / 1000)}:${style}>`;
-}
