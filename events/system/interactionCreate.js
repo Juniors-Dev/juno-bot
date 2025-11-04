@@ -1,4 +1,5 @@
 import { Events, ActionRowBuilder, ButtonStyle, ButtonBuilder, MessageFlags } from "discord.js";
+import { sendReply } from "../../utils/reply.js";
 
 export default {
   name: Events.InteractionCreate,
@@ -12,9 +13,9 @@ export default {
     }
 
     try {
-      const { userService } = interaction.services;
-      const isUser = await userService.getOneDiscordId(interaction.user.id);
-      if (!isUser) {
+      const { userService, sessionService } = interaction.services;
+      const user = await userService.getOneDiscordId(interaction.user.id);
+      if (!user) {
         await interaction.deferReply({ flags: MessageFlags.Ephemeral });
         const button = new ButtonBuilder()
           .setCustomId("create_user_modal_button")
@@ -29,14 +30,27 @@ export default {
         });
       }
 
+      const session = await sessionService.getOneActive(user.id);
+
+      interaction.context = {
+        user,
+        session,
+        // settings,
+        // isProDuck,
+        // any other existential baggage your user might have
+      };
+
+      if (command.guards?.length) {
+        for (const guard of command.guards) {
+          const passed = await guard(interaction);
+          if (!passed) return;
+        }
+      }
+
       await command.execute(interaction);
     } catch (error) {
-      console.error(error);
-      if (interaction.deferred || interaction.replied) {
-        await interaction.editReply("Something broke.");
-      } else {
-        await interaction.reply({ content: "Something broke.", ephemeral: true });
-      }
+      console.error("interactionCreate error:", error);
+      await sendReply(interaction, "Something broke.", { ephemeral: true });
     }
   },
 };
