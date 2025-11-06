@@ -7,7 +7,8 @@ export async function requireActiveSession(interaction) {
   const clockInButton = new ButtonBuilder()
     .setCustomId("guard.clock-in")
     .setLabel("Clock In")
-    .setStyle(ButtonStyle.Success);
+    .setStyle(ButtonStyle.Success)
+    .setEmoji("⏱️");
 
   const row = new ActionRowBuilder().addComponents(clockInButton);
 

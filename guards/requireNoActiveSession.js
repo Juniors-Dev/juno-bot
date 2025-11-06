@@ -7,7 +7,8 @@ export async function requireNoActiveSession(interaction) {
   const clockOutButton = new ButtonBuilder()
     .setCustomId("guard.clock-out")
     .setLabel("Clock Out")
-    .setStyle(ButtonStyle.Danger);
+    .setStyle(ButtonStyle.Danger)
+    .setEmoji("🛑");
 
   const row = new ActionRowBuilder().addComponents(clockOutButton);
 
