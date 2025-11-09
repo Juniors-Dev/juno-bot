@@ -10,7 +10,6 @@ export default class ProjectService {
   // CREATE PROJECT
   async create({ name, description, status = "active", ownerId }) {
     const project = await this.Project.create({ name, description, status });
-
     // auto-assign creator as admin
     await this.ProjectMember.create({
       projectId: project.id,
@@ -35,7 +34,19 @@ export default class ProjectService {
   async listActive() {
     return this.Project.findAll({
       where: { status: "active" },
-      include: [{ model: this.ProjectMember, as: "projectMembers" }],
+      include: [
+        {
+          model: this.ProjectMember,
+          as: "projectMembers",
+          include: [
+            {
+              model: this.User,
+              as: "user", // must match association alias
+              attributes: ["id", "name", "discordId"], // or whatever columns you need
+            },
+          ],
+        },
+      ],
       order: [["updatedAt", "DESC"]],
     });
   }
