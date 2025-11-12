@@ -21,3 +21,8 @@ export function parseIds(value) {
     .map((s) => s.trim())
     .filter(Boolean);
 }
+
+export const getEnvInt = (name, defaultValue) => {
+  const value = parseInt(process.env[name] ?? "", 10);
+  return Number.isNaN(value) ? defaultValue : value;
+};
