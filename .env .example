@@ -6,7 +6,7 @@ token= ""
 statusChannelId= ""
 chatSummaryChannelId= ""
 clientId= ""
-guildId= "" 
+guildId= ""
 sourceChannelIds= []
 
 # AI / Ollama
@@ -21,3 +21,10 @@ ADMIN_PASSWORD=secret
 DIALECT=postgres
 CRUD_USERNAME=crud_user
 CRUD_PASSWORD=crud_password
+
+# Session Timers
+DEFAULT_SESSION_MINUTES=120
+MAX_SESSION_MINUTES=480
+WARN_BEFORE_MINUTES=5
+GRACE_MINUTES=3
+ABANDONED_CUTOFF_HOURS=12
