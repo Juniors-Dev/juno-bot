@@ -12,13 +12,6 @@ export default {
     const { userService, sessionService } = interaction.services;
     const user = await userService.getOneDiscordId(interaction.user.id);
 
-    if (!user) {
-      return interaction.reply({
-        content: "You're not in the database yet. Use `/create-user` first.",
-        flags: MessageFlags.Ephemeral,
-      });
-    }
-
     await interaction.deferUpdate();
 
     try {
