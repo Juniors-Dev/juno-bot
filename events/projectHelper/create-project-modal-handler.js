@@ -6,13 +6,12 @@ export default {
   async execute(interaction) {
     if (!interaction.isModalSubmit()) return;
     if (interaction.customId !== "create_project_modal") return;
-    const { projectService } = interaction.services;
+    const { projectService, userService } = interaction.services;
     const name = interaction.fields.getTextInputValue("name").trim();
     const description = interaction.fields.getTextInputValue("description").trim();
 
     await interaction.deferReply({ flags: MessageFlags.Ephemeral });
     try {
-      const { userService, sessionService } = interaction.services;
       const user = await userService.getOneDiscordId(interaction.user.id);
       const existingProjects = await projectService.listByUser(user.id);
       if (existingProjects.some((p) => p.name.toLowerCase() === name.toLowerCase())) {
