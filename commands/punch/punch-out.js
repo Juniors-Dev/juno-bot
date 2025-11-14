@@ -1,6 +1,7 @@
-import { SlashCommandBuilder, MessageFlags, time, TimestampStyles } from "discord.js";
-import { formatDurationMs } from "../../utils/formatTime.js";
+import { SlashCommandBuilder, MessageFlags } from "discord.js";
+import { buildClockOutMessagePayload } from "../../features/session/sessionMessageBuilder.js";
 import { requireActiveSession } from "../../guards/index.js";
+import { cancelTimer } from "../../features/session/timerManager.js";
 
 export default {
   data: new SlashCommandBuilder()
@@ -13,27 +14,20 @@ export default {
 
     try {
       const { sessionService } = interaction.services;
-      const { user } = interaction.context;
+      const { user, session } = interaction.context;
+
+      if (session) {
+        cancelTimer(session.id);
+      }
 
       const result = await sessionService.end(user.id);
-      if (!result) return interaction.editReply("You're not clocked in. Use `/clock-in` first.");
 
-      const { session, durationMs } = result;
-      const started = time(session.startedAt, TimestampStyles.ShortTime);
-      const ended = time(session.endedAt, TimestampStyles.ShortTime);
-      const durationText = formatDurationMs(durationMs, { mode: "round" });
-      const activityText = session.activity ? `\nWorked on: ${session.activity}` : "";
-
-      await interaction.editReply(
-        `✅ **Clocked out**\n` +
-          `Started: ${started}\n` +
-          `Ended: ${ended}\n` +
-          `Duration: ${durationText}${activityText}`,
-      );
+      const payload = buildClockOutMessagePayload(result);
+      await interaction.editReply(payload);
       // TODO: Update dashboard
     } catch (err) {
       console.error("Clock-out error:", err);
-      await interaction.editReply("Something went wrong");
+      await interaction.editReply("Something went wrong..👀");
     }
   },
 };

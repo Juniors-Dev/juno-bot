@@ -1,5 +1,8 @@
-import { SlashCommandBuilder, MessageFlags, time, TimestampStyles } from "discord.js";
+import { SlashCommandBuilder, MessageFlags } from "discord.js";
+import { buildClockInMessagePayload } from "../../features/session/sessionMessageBuilder.js";
+import { startTimer } from "../../features/session/timerManager.js";
 import { requireNoActiveSession } from "../../guards/index.js";
+import { DEFAULT_SESSION_MINUTES, MAX_SESSION_MINUTES } from "../../features/session/constants.js";
 
 export default {
   data: new SlashCommandBuilder()
@@ -10,6 +13,14 @@ export default {
         .setName("activity")
         .setDescription("What are you working on? (optional)")
         .setRequired(false),
+    )
+    .addIntegerOption((option) =>
+      option
+        .setName("duration")
+        .setDescription("Planned duration in minutes (optional)")
+        .setRequired(false)
+        .setMinValue(10)
+        .setMaxValue(MAX_SESSION_MINUTES),
     ),
   guards: [requireNoActiveSession],
 
@@ -21,17 +32,29 @@ export default {
       const { user } = interaction.context;
 
       const activity = interaction.options.getString("activity")?.trim() || null;
-      const session = await sessionService.start(user.id, { activity });
-      if (!session)
-        return interaction.editReply("You're already clocked in. Use `/clock-out` first.");
+      const durationOptionMinutes = interaction.options.getInteger("duration");
 
-      const started = time(session.startedAt, TimestampStyles.ShortTime);
-      const activityText = activity ? `\nWorking on: ${activity}` : "";
-      await interaction.editReply(`✅ **Clocked in!**\nStarted: ${started}${activityText}`);
+      const plannedDurationMinutes =
+        typeof durationOptionMinutes === "number" ? durationOptionMinutes : DEFAULT_SESSION_MINUTES;
+
+      const session = await sessionService.start(user.id, {
+        activity,
+        targetDurationMinutes: plannedDurationMinutes,
+      });
+
+      startTimer(interaction.client, session, plannedDurationMinutes);
+
+      const payload = buildClockInMessagePayload({
+        session,
+        targetDurationMinutes: plannedDurationMinutes,
+        activity,
+      });
+
+      await interaction.editReply(payload);
       // TODO: Update dashboard
     } catch (err) {
       console.error("Clock-in error:", err);
-      await interaction.editReply("Something went wrong");
+      await interaction.editReply("Something went wrong..👀");
     }
   },
 };
