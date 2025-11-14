@@ -1,5 +1,5 @@
 import { Client, GatewayIntentBits, Collection, Events } from "discord.js";
-//import { recoverTimersOnStartup } from "./features/sessionTimers/restoreTimers.js";
+//import { restoreTimersOnStartup } from "./features/session/restoreTimers.js";
 import addCommands from "./utils/addCommands.js";
 import addEvents from "./utils/addEvents.js";
 import { required } from "./utils/envHelpers.js";
@@ -50,7 +50,7 @@ await addEvents(client);
 
 client.once("ready", async (readyClient) => {
   console.log(`Ready! Logged in as ${readyClient.user.tag}`);
-  //await recoverTimersOnStartup(client);
+  //await restoreTimersOnStartup(client);
   addJobs(client);
 });
 
