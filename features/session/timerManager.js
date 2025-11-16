@@ -109,7 +109,8 @@ async function sendWarningDM(client, session, endTimestampMs) {
       new ButtonBuilder()
         .setCustomId(customIdClockOut)
         .setLabel("Clock Out")
-        .setStyle(ButtonStyle.Danger),
+        .setStyle(ButtonStyle.Danger)
+        .setEmoji("🛑"),
     );
 
     const endDate = new Date(endTimestampMs);
