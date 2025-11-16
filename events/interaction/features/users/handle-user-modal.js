@@ -21,9 +21,9 @@ export async function handleCreateUserModal(interaction) {
       name,
     });
 
-    await interaction.editReply("✅ User created successfully.");
+    return await interaction.editReply("✅ User created successfully.");
   } catch (err) {
     console.error("User creation error:", err);
-    await interaction.editReply("Errmmm you broke something wasn't me!");
+    return await interaction.editReply("Errmmm you broke something wasn't me!");
   }
 }
