@@ -4,7 +4,6 @@ import { handleChatInputCommand } from "./handlers/command.js";
 import { buttonHandlers } from "./handlers/button.js";
 import { modalSubmitHandlers } from "./handlers/modal.js";
 import { selectHandlers } from "./handlers/select.js";
-import { triggers } from "../message/triggers.js";
 
 export default {
   name: Events.InteractionCreate,
@@ -28,13 +27,6 @@ export default {
       if (interaction.isAnySelectMenu()) {
         await handleEvent(interaction, selectHandlers);
         return;
-      }
-
-      for (const trigger of triggers) {
-        if (trigger.match(interaction)) {
-          await trigger.run(interaction);
-          return;
-        }
       }
     } catch (error) {
       console.error("[InteractionCreate] Unhandled error:", error);
