@@ -112,7 +112,7 @@ export default class TaskService {
     );
   }
 
-  async updateStatus(taskId, userId, status, { transaction } = {}) {
+  async updateStatus(taskId, userId, status) {
     const ALLOWED = ["todo", "in_progress", "done", "archived"];
     if (!ALLOWED.includes(status)) {
       throw Object.assign(new Error("Invalid status"), { code: "INVALID_STATUS" });
@@ -120,13 +120,13 @@ export default class TaskService {
 
     const [count, rows] = await this.Task.update(
       { status },
-      { where: { id: taskId, userId }, returning: true, validate: true, transaction },
+      { where: { id: taskId, userId }, returning: true, validate: true },
     );
 
     return count ? rows[0] : null;
   }
 
-  async update(taskId, userId, updates, { transaction } = {}) {
+  async update(taskId, userId, updates) {
     const cleanUpdates = {};
 
     if (updates.title !== undefined) cleanUpdates.title = updates.title.trim();
@@ -139,23 +139,22 @@ export default class TaskService {
       where: { id: taskId, userId },
       returning: true,
       validate: true,
-      transaction,
     });
 
     return count ? rows[0] : null;
   }
 
-  async archive(taskId, userId, { transaction } = {}) {
+  async archive(taskId, userId) {
     const [count] = await this.Task.update(
       { status: "archived" },
-      { where: { id: taskId, userId }, validate: true, transaction },
+      { where: { id: taskId, userId }, validate: true },
     );
 
     return count > 0;
   }
 
-  async delete(taskId, userId, { transaction } = {}) {
-    const count = await this.Task.destroy({ where: { id: taskId, userId }, transaction });
+  async delete(taskId, userId) {
+    const count = await this.Task.destroy({ where: { id: taskId, userId } });
     return count > 0;
   }
 
