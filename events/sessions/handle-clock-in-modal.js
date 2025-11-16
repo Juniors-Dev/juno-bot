@@ -6,7 +6,7 @@ import { DEFAULT_SESSION_MINUTES, MAX_SESSION_MINUTES } from "../../features/ses
 export default {
   name: Events.InteractionCreate,
   async execute(interaction) {
-    if (!interaction.isModalSubmit() || interaction.customId !== "guard.clock-in.modal") return;
+    if (!interaction.isModalSubmit() || interaction.customId !== "clock_in_modal") return;
 
     const { userService, sessionService } = interaction.services;
     const user = await userService.getOneDiscordId(interaction.user.id);

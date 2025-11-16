@@ -9,9 +9,9 @@ import {
 export default {
   name: Events.InteractionCreate,
   async execute(interaction) {
-    if (!interaction.isButton() || interaction.customId !== "guard.clock-in") return;
+    if (!interaction.isButton() || interaction.customId !== "clock_in_button") return;
 
-    const modal = new ModalBuilder().setCustomId("guard.clock-in.modal").setTitle("Clock In");
+    const modal = new ModalBuilder().setCustomId("clock_in_modal").setTitle("Clock In");
 
     const activityInput = new TextInputBuilder()
       .setCustomId("activity")

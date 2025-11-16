@@ -5,7 +5,7 @@ import { cancelTimer } from "../../features/session/timerManager.js";
 export default {
   name: Events.InteractionCreate,
   async execute(interaction) {
-    if (!interaction.isButton() || interaction.customId !== "guard.clock-out") return;
+    if (!interaction.isButton() || interaction.customId !== "clock_out_button") return;
 
     const { userService, sessionService } = interaction.services;
     const user = await userService.getOneDiscordId(interaction.user.id);
