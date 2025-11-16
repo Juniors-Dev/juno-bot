@@ -5,7 +5,7 @@ export async function requireNoActiveSession(interaction) {
   if (!interaction.context?.session) return true;
 
   const clockOutButton = new ButtonBuilder()
-    .setCustomId("guard.clock-out")
+    .setCustomId("clock_out_button")
     .setLabel("Clock Out")
     .setStyle(ButtonStyle.Danger)
     .setEmoji("🛑");
