@@ -1,8 +1,4 @@
 import { Op } from "sequelize";
-/**
- * TODO:
- * add pagination/search and DB GROUP BY summary
- */
 export default class TaskService {
   constructor(db) {
     this.client = db.sequelize;
