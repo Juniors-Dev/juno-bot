@@ -1,6 +1,6 @@
 // events/handlers/chatInputCommand.js
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags } from "discord.js";
-import { sendReply } from "../../utils/reply.js";
+import { sendReply } from "../../../utils/reply.js";
 
 export async function handleChatInputCommand(interaction) {
   const command = interaction.client.commands.get(interaction.commandName);

@@ -1,9 +1,9 @@
 import { Events } from "discord.js";
-import { handleEvent } from "./handleEvent.js";
-import { handleChatInputCommand } from "./command.js";
-import { buttonHandlers } from "./button.js";
-import { modalSubmitHandlers } from "./modal.js";
-import { selectHandlers } from "./select.js";
+import { handleEvent } from "./handlers/handleEvent.js";
+import { handleChatInputCommand } from "./handlers/command.js";
+import { buttonHandlers } from "./handlers/button.js";
+import { modalSubmitHandlers } from "./handlers/modal.js";
+import { selectHandlers } from "./handlers/select.js";
 import { triggers } from "../message/triggers.js";
 
 export default {
