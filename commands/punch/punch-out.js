@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, MessageFlags } from "discord.js";
-import { buildClockOutMessagePayload } from "../../features/session/sessionMessageBuilder.js";
+import { buildClockOutMessagePayload } from "../../features/session/messageBuilder.js";
 import { requireActiveSession } from "../../guards/index.js";
 import { cancelTimer } from "../../features/session/timerManager.js";
 
