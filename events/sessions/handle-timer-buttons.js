@@ -1,7 +1,7 @@
 import { Events, time, TimestampStyles, MessageFlags } from "discord.js";
 import { formatMinutesHm } from "../../utils/formatTime.js";
 import { extendTimer, cancelTimer } from "../../features/session/timerManager.js";
-import { buildClockOutMessagePayload } from "../../features/session/sessionMessageBuilder.js";
+import { buildClockOutMessagePayload } from "../../features/session/messageBuilder.js";
 
 export default {
   name: Events.InteractionCreate,
