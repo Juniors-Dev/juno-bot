@@ -1,5 +1,7 @@
+import { appendContext } from "../../../utils/appendContext.js";
+
 export async function handleEvent(interaction, handlers) {
-  const key = interaction.customId || interaction.commandName;
+  const key = interaction.customId.split(":")[0];
 
   const handler = handlers[key];
   if (!handler) {
@@ -7,8 +9,10 @@ export async function handleEvent(interaction, handlers) {
     return;
   }
 
+  await appendContext(interaction, handler.context);
+
   try {
-    return await handler(interaction);
+    return await handler.run(interaction);
   } catch (err) {
     console.error(`Interaction error (${key}):`, err);
   }
