@@ -1,5 +1,5 @@
 import { Events, MessageFlags } from "discord.js";
-import { buildClockOutMessagePayload } from "../../features/session/sessionMessageBuilder.js";
+import { buildClockOutMessagePayload } from "../../features/session/messageBuilder.js";
 import { cancelTimer } from "../../features/session/timerManager.js";
 
 export default {
