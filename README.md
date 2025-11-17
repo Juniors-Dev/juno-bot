@@ -4,20 +4,18 @@ An organizational bot for our discord.
 
 # Juno-bot
 
-A Discord bot for Juniors.dev that summarizes chat activity using AI (TinyLlama via Ollama on Fly.io), manages daily status, and more.
+A Discord bot for Juniors.dev that handles time management,task management, project management, and other organizational features potentially leveraging AI for summarization and insights in later versions.
 
 ## Features
 
-- **AI Summarization**: Summarizes large amounts of chat using chunked requests to an Ollama AI server.
-- **Daily Scheduler**: Posts good morning and good night messages automatically.
-- **Slash Commands**: Includes `/summarize-channel`, `/status`, `/note`, `/todo`, and more.
+-
 
 ## Setup
 
 ### 1. Clone the repository
 
 ```sh
-git clone https://github.com/johnDavid97/Juno-bot.git
+git clone https://github.com/Juniors-Dev/juno-bot.git
 cd Juno-bot
 ```
 
@@ -29,19 +27,30 @@ npm install
 
 ### 3. Configure the bot
 
-Edit `config.json` with your Discord bot credentials and channel IDs:
+Create a `.env` file in the root directory using the provided `.env.example` as a template:
 
-```json
-{
-  "token": "YOUR_DISCORD_BOT_TOKEN",
-  "statusChannelId": "DISCORD_CHANNEL_ID_FOR_STATUS",
-  "chatSummaryChannelId": "DISCORD_CHANNEL_ID_FOR_SUMMARIES",
-  "clientId": "YOUR_BOT_CLIENT_ID",
-  "guildId": "YOUR_GUILD_ID",
-  "sourceChannelIds": ["CHANNEL_ID_1", "CHANNEL_ID_2"],
-  "ollamaUrl": "https://your-ollama-instance.fly.dev",
-  "ollamaModel": "tinyllama"
-}
+```.env
+# Discord
+token= ""
+statusChannelId= ""
+chatSummaryChannelId= ""
+clientId= ""
+guildId= ""
+sourceChannelIds= []
+
+#AI
+ollamaUrl= "https://juno-ollama.fly.dev"
+ollamaModel= "tinyllama"
+
+# Database
+HOST=localhost
+DATABASE_NAME=juno_time_dev
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=secret
+DIALECT=postgres
+CRUD_USERNAME=crud_user
+CRUD_PASSWORD=crud_password
+SSL = false
 ```
 
 **Never commit your real token to version control!**
@@ -52,10 +61,20 @@ Edit `config.json` with your Discord bot credentials and channel IDs:
 - Under "Privileged Gateway Intents", enable **Message Content Intent**.
 - Make sure your bot code includes `GatewayIntentBits.MessageContent` (already set in `index.js`).
 
-### 5. Run the bot
+### 5. Set up the database
+
+You can setup a PostgreSQL database locally or hosted, but a docker compose setup is provided for convenience. Open docker desktop then run the following command in the project root:
 
 ```sh
-node index.js
+docker-compose up -d
+```
+
+### 6. Run the bot
+
+```sh
+npm run start
+# or for development:
+npm run dev
 ```
 
 ## Deploying Slash Commands
@@ -63,24 +82,18 @@ node index.js
 Whenever you add or modify slash commands in the `commands/` directory, you need to deploy them to Discord:
 
 ```sh
-node deploy-commands.js.js
+node deploy-commands.js
 ```
 
 This will register (or update) all slash commands for your guild.
 
 ## Usage
 
-- Use `/summarize-channel` to summarize a channel's recent messages. The bot will handle large histories by chunking and combining summaries.
-- Other commands: `/status`, `/note`, `/todo`, etc.
+TODO: Add usage instructions for commands and features once finalized.
 
 ## Troubleshooting
 
-- **Bot can't read messages?**  
-  Ensure the "Message Content Intent" is enabled in both the Discord Developer Portal and your code.
-- **Summarization times out or fails?**  
-  This can happen if the Ollama server is cold-starting or overloaded. Try again, or adjust your Fly.io auto-stop settings to reduce cold starts.
-- **Token/context limits?**  
-  The bot automatically chunks large message histories to fit within AI model limits.
+TODO: Add common issues and solutions.
 
 ## Development
 
