@@ -16,17 +16,26 @@ export default class ProjectService {
     if (ownerId === undefined || ownerId === null || ownerId === "") {
       throw new Error("ownerId is required.");
     }
-    const project = await this.Project.create({ name, description, status });
+    return await this.client.transaction(async (t) => {
+      const project = await this.Project.create(
+        { name, description, status },
+        { transaction: t }
+      );
 
-    // auto-assign creator as admin
-    await this.ProjectMember.create({
-      projectId: project.id,
-      userId: ownerId,
-      isAdmin: true,
-      canAddLinks: true,
+      // auto-assign creator as admin
+      await this.ProjectMember.create(
+        {
+          projectId: project.id,
+          userId: ownerId,
+          isAdmin: true,
+          canAddLinks: true,
+        },
+        { transaction: t }
+      );
+
+      // ensure getById uses the transaction for consistency
+      return this.getById(project.id);
     });
-
-    return this.getById(project.id);
   }
 
   // READ
