@@ -1,4 +1,3 @@
-// events/handlers/chatInputCommand.js
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags } from "discord.js";
 import { sendReply } from "../../../utils/reply.js";
 
