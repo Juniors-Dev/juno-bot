@@ -9,6 +9,13 @@ export default class ProjectService {
 
   // CREATE PROJECT
   async create({ name, description, status = "active", ownerId }) {
+    // Validate required parameters
+    if (typeof name !== "string" || name.trim() === "") {
+      throw new Error("Project name is required and must be a non-empty string.");
+    }
+    if (ownerId === undefined || ownerId === null || ownerId === "") {
+      throw new Error("ownerId is required.");
+    }
     const project = await this.Project.create({ name, description, status });
 
     // auto-assign creator as admin
