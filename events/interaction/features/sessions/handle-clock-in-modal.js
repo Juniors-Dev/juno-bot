@@ -7,7 +7,7 @@ import {
 } from "../../../../features/session/constants.js";
 
 export async function handleClockInModal(interaction) {
-  const { user } = interaction.context;
+  const { user } = interaction.botContext;
   const { sessionService } = interaction.services;
 
   await interaction.deferReply({ flags: MessageFlags.Ephemeral });

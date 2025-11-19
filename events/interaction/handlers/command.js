@@ -13,7 +13,7 @@ export async function handleChatInputCommand(interaction) {
     const context = await buildInteractionContext(interaction);
     if (!context) return;
 
-    interaction.context = context;
+    interaction.botContext = context;
 
     if (command.guards?.length) {
       const passed = await runGuards(command.guards, interaction);

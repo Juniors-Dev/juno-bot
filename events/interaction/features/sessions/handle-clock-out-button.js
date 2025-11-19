@@ -3,7 +3,7 @@ import { buildClockOutMessagePayload } from "../../../../features/session/messag
 import { cancelTimer } from "../../../../features/session/timerManager.js";
 
 export async function handleClockOutButton(interaction) {
-  const { user, session } = interaction.context;
+  const { user, session } = interaction.botContext;
   const { sessionService } = interaction.services;
 
   await interaction.deferUpdate();

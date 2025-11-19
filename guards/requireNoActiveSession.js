@@ -2,7 +2,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 import { replyEphemeral } from "../utils/reply.js";
 
 export async function requireNoActiveSession(interaction) {
-  if (!interaction.context?.session) return true;
+  if (!interaction.botContext?.session) return true;
 
   const clockOutButton = new ButtonBuilder()
     .setCustomId("clock_out_button")
