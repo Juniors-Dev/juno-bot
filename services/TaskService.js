@@ -1,4 +1,14 @@
 import { Op } from "sequelize";
+
+const TASK_STATUS = {
+  TODO: "todo",
+  IN_PROGRESS: "in_progress",
+  DONE: "done",
+  ARCHIVED: "archived",
+};
+
+const ALLOWED_STATUSES = Object.values(TASK_STATUS);
+
 export default class TaskService {
   constructor(db) {
     this.client = db.sequelize;
@@ -9,23 +19,33 @@ export default class TaskService {
     this.Project = db.Project;
   }
 
+  _validateStatus(status) {
+    if (!ALLOWED_STATUSES.includes(status)) {
+      throw Object.assign(new Error(`Invalid status: ${status}`), {
+        code: "INVALID_STATUS",
+      });
+    }
+  }
+
+  _getProjectInclude(attributes = ["id", "name"]) {
+    return {
+      model: this.Project,
+      as: "project",
+      attributes,
+    };
+  }
+
   async getActiveByUser(userId, { includeProject = false } = {}) {
     const options = {
       where: {
         userId,
-        status: { [Op.in]: ["todo", "in_progress"] },
+        status: { [Op.in]: [TASK_STATUS.TODO, TASK_STATUS.IN_PROGRESS] },
       },
       order: [["updatedAt", "DESC"]],
     };
 
     if (includeProject) {
-      options.include = [
-        {
-          model: this.Project,
-          as: "project",
-          attributes: ["id", "name"],
-        },
-      ];
+      options.include = [this._getProjectInclude()];
     }
 
     return this.Task.findAll(options);
@@ -37,19 +57,16 @@ export default class TaskService {
     };
 
     if (includeProject) {
-      options.include = [
-        {
-          model: this.Project,
-          as: "project",
-          attributes: ["id", "name", "status"],
-        },
-      ];
+      options.include = [this._getProjectInclude(["id", "name", "status"])];
     }
 
     return this.Task.findOne(options);
   }
 
-  async getByUser(userId, { status = null, projectId = null, includeProject = false } = {}) {
+  async getByUser(
+    userId,
+    { status = null, projectId = null, includeProject = false, limit = 50, offset = 0 } = {},
+  ) {
     const where = { userId };
 
     if (status) {
@@ -61,13 +78,17 @@ export default class TaskService {
     }
 
     const statusOrder = this.client.literal(
-      "CASE status " +
-        "WHEN 'todo' THEN 1 " +
-        "WHEN 'in_progress' THEN 2 " +
-        "WHEN 'done' THEN 3 " +
-        "WHEN 'archived' THEN 4 " +
-        "ELSE 99 END",
+      `CASE status
+         WHEN '${TASK_STATUS.TODO}' THEN 1
+         WHEN '${TASK_STATUS.IN_PROGRESS}' THEN 2
+         WHEN '${TASK_STATUS.DONE}' THEN 3
+         WHEN '${TASK_STATUS.ARCHIVED}' THEN 4
+         ELSE 99
+       END`,
     );
+
+    const safeLimit = Math.min(Math.max(limit ?? 50, 1), 100);
+    const safeOffset = Math.max(offset ?? 0, 0);
 
     const options = {
       where,
@@ -75,16 +96,12 @@ export default class TaskService {
         [statusOrder, "ASC"],
         ["updatedAt", "DESC"],
       ],
+      limit: safeLimit,
+      offset: safeOffset,
     };
 
     if (includeProject) {
-      options.include = [
-        {
-          model: this.Project,
-          as: "project",
-          attributes: ["id", "name"],
-        },
-      ];
+      options.include = [this._getProjectInclude()];
     }
 
     return this.Task.findAll(options);
@@ -92,13 +109,24 @@ export default class TaskService {
 
   async create(
     userId,
-    { title, description = null, projectId = null, status = "todo", dueAt = null },
+    { title, description = null, projectId = null, status = TASK_STATUS.TODO, dueAt = null },
     { transaction } = {},
   ) {
+    if (!title || typeof title !== "string") {
+      throw Object.assign(new Error("Title is required"), { code: "INVALID_INPUT" });
+    }
+
+    let trimmedTitle = title.trim();
+    if (!trimmedTitle) {
+      throw Object.assign(new Error("Title cannot be empty"), { code: "INVALID_INPUT" });
+    }
+
+    this._validateStatus(status);
+
     return this.Task.create(
       {
         userId,
-        title: title.trim(),
+        title: trimmedTitle,
         description,
         projectId,
         status,
@@ -108,49 +136,81 @@ export default class TaskService {
     );
   }
 
-  async updateStatus(taskId, userId, status) {
-    const ALLOWED = ["todo", "in_progress", "done", "archived"];
-    if (!ALLOWED.includes(status)) {
-      throw Object.assign(new Error("Invalid status"), { code: "INVALID_STATUS" });
-    }
+  async updateStatus(taskId, userId, status, { transaction } = {}) {
+    this._validateStatus(status);
 
     const [count, rows] = await this.Task.update(
       { status },
-      { where: { id: taskId, userId }, returning: true, validate: true },
+      {
+        where: { id: taskId, userId },
+        returning: true,
+        validate: true,
+        transaction,
+      },
     );
 
     return count ? rows[0] : null;
   }
 
-  async update(taskId, userId, updates) {
+  async update(taskId, userId, updates, { transaction } = {}) {
     const cleanUpdates = {};
 
-    if (updates.title !== undefined) cleanUpdates.title = updates.title.trim();
-    if (updates.description !== undefined) cleanUpdates.description = updates.description;
-    if (updates.projectId !== undefined) cleanUpdates.projectId = updates.projectId;
-    if (updates.dueAt !== undefined)
+    if (updates.title !== undefined) {
+      if (!updates.title || typeof updates.title !== "string") {
+        throw Object.assign(new Error("Title is required"), { code: "INVALID_INPUT" });
+      }
+      let trimmedTitle = updates.title.trim();
+      if (!trimmedTitle) {
+        throw Object.assign(new Error("Title cannot be empty"), { code: "INVALID_INPUT" });
+      }
+      cleanUpdates.title = trimmedTitle;
+    }
+
+    if (updates.description !== undefined) {
+      cleanUpdates.description = updates.description;
+    }
+
+    if (updates.projectId !== undefined) {
+      cleanUpdates.projectId = updates.projectId;
+    }
+
+    if (updates.dueAt !== undefined) {
       cleanUpdates.dueAt = updates.dueAt ? new Date(updates.dueAt) : null;
+    }
+
+    if (updates.status !== undefined) {
+      this._validateStatus(updates.status);
+      cleanUpdates.status = updates.status;
+    }
 
     const [count, rows] = await this.Task.update(cleanUpdates, {
       where: { id: taskId, userId },
       returning: true,
       validate: true,
+      transaction,
     });
 
     return count ? rows[0] : null;
   }
 
-  async archive(taskId, userId) {
+  async archive(taskId, userId, { transaction } = {}) {
     const [count] = await this.Task.update(
-      { status: "archived" },
-      { where: { id: taskId, userId }, validate: true },
+      { status: TASK_STATUS.ARCHIVED },
+      {
+        where: { id: taskId, userId },
+        validate: true,
+        transaction,
+      },
     );
 
     return count > 0;
   }
 
-  async delete(taskId, userId) {
-    const count = await this.Task.destroy({ where: { id: taskId, userId } });
+  async delete(taskId, userId, { transaction } = {}) {
+    const count = await this.Task.destroy({
+      where: { id: taskId, userId },
+      transaction,
+    });
     return count > 0;
   }
 
@@ -186,6 +246,7 @@ export default class TaskService {
     });
   }
 
+  //most recently linked task for a session
   async getCurrentTaskForSession(sessionId) {
     const sessionTask = await this.SessionTask.findOne({
       where: { sessionId },
@@ -193,13 +254,7 @@ export default class TaskService {
         {
           model: this.Task,
           as: "task",
-          include: [
-            {
-              model: this.Project,
-              as: "project",
-              attributes: ["id", "name"],
-            },
-          ],
+          include: [this._getProjectInclude()],
         },
       ],
       order: [["createdAt", "DESC"]],
@@ -215,13 +270,7 @@ export default class TaskService {
         {
           model: this.Task,
           as: "task",
-          include: [
-            {
-              model: this.Project,
-              as: "project",
-              attributes: ["id", "name"],
-            },
-          ],
+          include: [this._getProjectInclude()],
         },
       ],
       order: [["createdAt", "ASC"]],
@@ -235,3 +284,5 @@ export default class TaskService {
     }));
   }
 }
+
+export { TASK_STATUS, ALLOWED_STATUSES };
