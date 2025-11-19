@@ -4,6 +4,7 @@ import { buildClockInMessagePayload } from "../../../../features/session/message
 import {
   DEFAULT_SESSION_MINUTES,
   MAX_SESSION_MINUTES,
+  MIN_SESSION_MINUTES,
 } from "../../../../features/session/constants.js";
 
 export async function handleClockInModal(interaction) {
@@ -19,8 +20,11 @@ export async function handleClockInModal(interaction) {
     let plannedDurationMinutes = DEFAULT_SESSION_MINUTES;
     if (durationInput) {
       const parsed = parseInt(durationInput, 10);
-      if (!isNaN(parsed) && parsed >= 10 && parsed <= MAX_SESSION_MINUTES) {
-        plannedDurationMinutes = parsed;
+      if (!isNaN(parsed)) {
+        plannedDurationMinutes = Math.max(
+          MIN_SESSION_MINUTES,
+          Math.min(parsed, MAX_SESSION_MINUTES),
+        );
       }
     }
 
