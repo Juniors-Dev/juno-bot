@@ -3,25 +3,25 @@ export async function appendContext(interaction, contextConfig = {}) {
 
   const { needsUser = false, needsSession = false } = contextConfig;
 
-  interaction.context = interaction.context || {};
+  interaction.botContext = interaction.botContext || {};
 
-  if (needsUser && !interaction.context.user) {
+  if (needsUser && !interaction.botContext.user) {
     const user = await interaction.services.userService.getOneDiscordId(interaction.user.id);
 
     if (!user) {
-      interaction.context.user = null;
+      interaction.botContext.user = null;
       // no user no session or any other context to be had.
       return;
     }
 
-    interaction.context.user = user;
+    interaction.botContext.user = user;
   }
 
   // Load session if needed
-  if (needsSession && interaction.context.user && !interaction.context.session) {
+  if (needsSession && interaction.botContext.user && !interaction.botContext.session) {
     const session = await interaction.services.sessionService.getOneActive(
-      interaction.context.user.id,
+      interaction.botContext.user.id,
     );
-    interaction.context.session = session || null;
+    interaction.botContext.session = session || null;
   }
 }

@@ -14,7 +14,7 @@ export default {
 
     try {
       const { sessionService } = interaction.services;
-      const { user, session } = interaction.context;
+      const { user, session } = interaction.botContext;
 
       if (session) {
         cancelTimer(session.id);

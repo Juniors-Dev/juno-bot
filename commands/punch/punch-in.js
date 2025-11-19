@@ -29,7 +29,7 @@ export default {
 
     try {
       const { sessionService } = interaction.services;
-      const { user } = interaction.context;
+      const { user } = interaction.botContext;
 
       const activity = interaction.options.getString("activity")?.trim() || null;
       const durationOptionMinutes = interaction.options.getInteger("duration");
