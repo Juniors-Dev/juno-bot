@@ -8,15 +8,6 @@ import {
   MAX_SESSION_MINUTES,
 } from "./constants.js";
 
-/**
- * In-memory timer registry.
- * Map<sessionId, {
- *   warnTimeout: Timeout|null,
- *   endTimeout: Timeout|null,
- *   graceTimeout: Timeout|null,
- *   warningMessage: Message|null
- * }>
- */
 const timerRegistry = new Map();
 
 export function startTimer(client, session, durationMinutes = DEFAULT_SESSION_MINUTES) {

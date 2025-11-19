@@ -72,11 +72,11 @@ async function sendRestartNotice(client, session, result) {
   const { session: endedSession, durationMs } = result;
 
   const ended = time(endedSession.endedAt, TimestampStyles.ShortTime);
-  const durationText = formatDurationMs(durationMs);
+  const duration = formatDurationMs(durationMs);
 
   const messageContent =
     `⏰ **Session ended due to a bot restart**\n\n` +
-    `You worked for **${durationText}**.\n` +
+    `You worked for **${duration}**.\n` +
     `Ended: ${ended}`;
 
   try {
