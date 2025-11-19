@@ -5,7 +5,7 @@ import { handleClockOutButton } from "../features/sessions/handle-clock-out-butt
 export const buttonHandlers = {
   create_user_modal_button: {
     run: handleCreateUserButton,
-    context: { needsUser: false, needsSession: false },
+    context: { needsUser: true, needsSession: false },
   },
   clock_in_button: {
     run: handleClockInButton,
