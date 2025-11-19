@@ -1,35 +1,19 @@
-import { Events, time, TimestampStyles, MessageFlags } from "discord.js";
+import { time, TimestampStyles, MessageFlags } from "discord.js";
 import { formatMinutesHm } from "../../../../utils/formatTime.js";
 import { extendTimer, cancelTimer } from "../../../../features/session/timerManager.js";
 import { buildClockOutMessagePayload } from "../../../../features/session/messageBuilder.js";
 
-export default {
-  name: Events.InteractionCreate,
-  async execute(interaction) {
-    if (!interaction.isButton()) return;
-
-    const { customId } = interaction;
-
-    if (!customId.startsWith("timer:extend:") && !customId.startsWith("timer:clockout:")) {
-      return;
-    }
-    await handleTimerButton(interaction);
-  },
-};
-
-async function handleTimerButton(interaction) {
+export async function handleTimerButtons(interaction) {
   await interaction.deferUpdate();
 
   try {
-    const { userService, sessionService } = interaction.services;
-
+    const { user } = interaction.botContext;
+    const { sessionService } = interaction.services;
     const parts = interaction.customId.split(":");
     const action = parts[1];
     const sessionId = parts[parts.length - 1];
 
-    const user = await userService.getOneDiscordId(interaction.user.id);
-
-    const session = await sessionService.getById(sessionId, { includeUser: true });
+    const session = await sessionService.getById(sessionId);
     if (!session || session.endedAt || session.userId !== user.id) {
       return interaction.editReply({
         content: "⚠️ This session is no longer active.",
@@ -38,7 +22,7 @@ async function handleTimerButton(interaction) {
     }
 
     if (action === "extend") {
-      const minutes = parseInt(parts[2]);
+      const minutes = parseInt(parts[2], 10);
 
       const result = await extendTimer(interaction.client, sessionId, minutes);
       if (!result) {
