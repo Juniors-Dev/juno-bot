@@ -83,8 +83,7 @@ export default class TaskService {
          WHEN '${TASK_STATUS.IN_PROGRESS}' THEN 2
          WHEN '${TASK_STATUS.DONE}' THEN 3
          WHEN '${TASK_STATUS.ARCHIVED}' THEN 4
-         ELSE 99
-       END`,
+         END`,
     );
 
     const safeLimit = Math.min(Math.max(limit ?? 50, 1), 100);
