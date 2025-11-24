@@ -123,7 +123,8 @@ export default class ProjectService {
     });
     if (!project) throw new Error("Project not found.");
     if (project.status === "active") return project;
-
+    if (project.status === 'active') return project;
+  
     const member = project.projectMembers.find((m) => m.userId === userId);
     if (!member?.isAdmin) throw new Error("You don't have permission to restore this project.");
 
