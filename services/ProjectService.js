@@ -17,10 +17,7 @@ export default class ProjectService {
       throw new Error("ownerId is required.");
     }
     return await this.client.transaction(async (t) => {
-      const project = await this.Project.create(
-        { name, description, status },
-        { transaction: t }
-      );
+      const project = await this.Project.create({ name, description, status }, { transaction: t });
 
       // auto-assign creator as admin
       await this.ProjectMember.create(
@@ -30,7 +27,7 @@ export default class ProjectService {
           isAdmin: true,
           canAddLinks: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       // ensure getById uses the transaction for consistency
@@ -82,8 +79,21 @@ export default class ProjectService {
     if (!member.isAdmin && !member.permissions?.canEdit)
       throw new Error("You don't have permission to edit this project.");
 
-    await this.Project.update(args, { where: { id } });
-    return this.getById(id);
+    // Only allow specific fields to be updated
+    const allowedFields = ["name", "description", "status"];
+    const updateData = {};
+    for (const key of allowedFields) {
+      if (Object.prototype.hasOwnProperty.call(args, key)) {
+        updateData[key] = args[key];
+      }
+    }
+    await this.Project.update(updateData, { where: { id } });
+    return this.Project.findByPk(id, {
+      include: [
+        { model: this.ProjectMember, as: "projectMembers" },
+        { model: this.Link, as: "links" },
+      ],
+    });
   }
 
   // DELETE (soft delete / archive)
@@ -93,12 +103,17 @@ export default class ProjectService {
       include: [{ model: this.ProjectMember, as: "projectMembers" }],
     });
     if (!project) throw new Error("Project not found.");
-
+    if (project.status === "archived") return project;
     const member = project.projectMembers.find((m) => m.userId === userId);
     if (!member?.isAdmin) throw new Error("You don't have permission to archive this project.");
 
     await this.Project.update({ status: "archived" }, { where: { id } });
-    return this.getById(id);
+    return this.Project.findByPk(id, {
+      include: [
+        { model: this.ProjectMember, as: "projectMembers" },
+        { model: this.Link, as: "links" },
+      ],
+    });
   }
 
   async restore({ id, userId }) {
@@ -107,6 +122,7 @@ export default class ProjectService {
       include: [{ model: this.ProjectMember, as: "projectMembers" }],
     });
     if (!project) throw new Error("Project not found.");
+    if (project.status === "active") return project;
 
     const member = project.projectMembers.find((m) => m.userId === userId);
     if (!member?.isAdmin) throw new Error("You don't have permission to restore this project.");
@@ -117,6 +133,8 @@ export default class ProjectService {
 
   // PROJECT MEMBERS
   async addMember({ projectId, userId, addedBy }) {
+    const user = await this.User.findByPk(userId);
+    if (!user) throw new Error("User not found.");
     const project = await this.Project.findOne({
       where: { id: projectId },
       include: [{ model: this.ProjectMember, as: "projectMembers" }],
@@ -148,7 +166,15 @@ export default class ProjectService {
 
     const member = project.projectMembers.find((m) => m.userId === removedBy);
     if (!member?.isAdmin) throw new Error("You don't have permission to remove members.");
-
+    // Prevent removing the last admin
+    const toRemove = project.projectMembers.find((m) => m.userId === userId);
+    if (!toRemove) throw new Error("User not found in project.");
+    if (toRemove.isAdmin) {
+      const adminCount = project.projectMembers.filter((m) => m.isAdmin).length;
+      if (adminCount <= 1) {
+        throw new Error("Cannot remove the last admin from the project.");
+      }
+    }
     await this.ProjectMember.destroy({ where: { projectId, userId } });
     return this.getById(projectId);
   }
@@ -166,7 +192,14 @@ export default class ProjectService {
     const target = project.projectMembers.find((m) => m.userId === targetId);
     if (!target) throw new Error("User not found in project.");
 
-    await this.ProjectMember.update(perms, {
+    const allowedFields = ["isAdmin", "canAddLinks"];
+    const safePerms = {};
+    for (const key of allowedFields) {
+      if (Object.prototype.hasOwnProperty.call(perms, key)) {
+        safePerms[key] = perms[key];
+      }
+    }
+    await this.ProjectMember.update(safePerms, {
       where: { projectId, userId: targetId },
     });
 
@@ -198,6 +231,9 @@ export default class ProjectService {
 
     const member = project.projectMembers.find((m) => m.userId === userId);
     if (!member?.isAdmin) throw new Error("You don’t have permission to remove links.");
+
+    const link = await this.Link.findOne({ where: { id: linkId, projectId } });
+    if (!link) throw new Error("Link not found in this project.");
 
     await this.Link.destroy({ where: { id: linkId, projectId } });
     return this.getById(projectId);
