@@ -1,4 +1,3 @@
-// events/handlers/chatInputCommand.js
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags } from "discord.js";
 import { sendReply } from "../../../utils/reply.js";
 
@@ -14,7 +13,7 @@ export async function handleChatInputCommand(interaction) {
     const context = await buildInteractionContext(interaction);
     if (!context) return;
 
-    interaction.context = context;
+    interaction.botContext = context;
 
     if (command.guards?.length) {
       const passed = await runGuards(command.guards, interaction);
