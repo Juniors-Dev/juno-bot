@@ -16,5 +16,6 @@ export async function requireActiveSession(interaction) {
     content: "You're not clocked in.",
     components: [row],
   });
+  //TODO: Add clock in button
   return false;
 }

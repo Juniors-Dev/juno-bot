@@ -3,7 +3,7 @@ export async function appendContext(interaction, contextConfig = {}) {
 
   const { needsUser = false, needsSession = false } = contextConfig;
 
-  interaction.context = interaction.botContext || {};
+  interaction.botContext = interaction.botContext || {};
 
   if (needsUser && !interaction.botContext.user) {
     const user = await interaction.services.userService.getOneDiscordId(interaction.user.id);
