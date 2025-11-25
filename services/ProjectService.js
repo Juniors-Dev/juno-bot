@@ -9,17 +9,16 @@ export default class ProjectService {
 
   // CREATE PROJECT
   async create({ name, description, status = "active", ownerId }) {
-    // Validate required parameters
     if (typeof name !== "string" || name.trim() === "") {
       throw new Error("Project name is required and must be a non-empty string.");
     }
-    if (ownerId === undefined || ownerId === null || ownerId === "") {
+    if (!ownerId) {
       throw new Error("ownerId is required.");
     }
-    return await this.client.transaction(async (t) => {
-      const project = await this.Project.create({ name, description, status }, { transaction: t });
 
-      // auto-assign creator as admin
+    return await this.client.transaction(async (transaction) => {
+      const project = await this.Project.create({ name, description, status }, { transaction });
+
       await this.ProjectMember.create(
         {
           projectId: project.id,
@@ -27,21 +26,21 @@ export default class ProjectService {
           isAdmin: true,
           canAddLinks: true,
         },
-        { transaction: t },
+        { transaction },
       );
 
-      // ensure getById uses the transaction for consistency
-      return this.getById(project.id);
+      return this.getById(project.id, { transaction });
     });
   }
 
   // READ
-  async getById(id) {
+  async getById(id, options = {}) {
     return this.Project.findByPk(id, {
       include: [
         { model: this.ProjectMember, as: "projectMembers" },
         { model: this.Link, as: "links" },
       ],
+      ...options,
     });
   }
 
@@ -123,8 +122,7 @@ export default class ProjectService {
     });
     if (!project) throw new Error("Project not found.");
     if (project.status === "active") return project;
-    if (project.status === 'active') return project;
-  
+
     const member = project.projectMembers.find((m) => m.userId === userId);
     if (!member?.isAdmin) throw new Error("You don't have permission to restore this project.");
 
