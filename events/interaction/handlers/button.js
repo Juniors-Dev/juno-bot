@@ -1,5 +1,7 @@
 import { handleCreateUserButton } from "../features/users/create-user-modal.js";
 import { handleTimerButtons } from "../features/sessions/handle-timer-buttons.js";
+import { handleProjectCreateModal } from "../features/projectHelper/project-create-modal-handler.js";
+import { projectCreateModal } from "../features/projectHelper/project-create-modal.js";
 
 export const buttonHandlers = {
   create_user_modal_button: {
@@ -8,6 +10,10 @@ export const buttonHandlers = {
   },
   timer: {
     run: handleTimerButtons,
+    context: { needsUser: true, needsSession: false },
+  },
+  project_create: {
+    run: projectCreateModal,
     context: { needsUser: true, needsSession: false },
   },
 };
