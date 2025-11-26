@@ -1,7 +1,6 @@
 import { ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder } from "discord.js";
 
 export async function projectCreateModal(interaction) {
-  console.log(interaction.customId, interaction.botContext);
   if (interaction.customId !== "project_create") return;
   if (!interaction.botContext.user) return;
   const modal = new ModalBuilder()
