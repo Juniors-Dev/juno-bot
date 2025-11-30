@@ -10,13 +10,16 @@ export async function handleProjectCreateModal(interaction) {
   const name = interaction.fields.getTextInputValue("name").trim();
   const description = interaction.fields.getTextInputValue("description").trim();
 
-  await interaction.deferReply({ flags: MessageFlags.Ephemeral });
   try {
     const user = await userService.getOneDiscordId(interaction.user.id);
     const existingProjects = await projectService.listByUser(user.id);
     if (existingProjects.some((p) => p.name.toLowerCase() === name.toLowerCase())) {
-      return interaction.editReply("You already have a project with that name.");
+      return interaction.reply({
+        content: "You already have a project with that name.",
+        flags: MessageFlags.Ephemeral,
+      });
     }
+    await interaction.deferUpdate({ flags: MessageFlags.Ephemeral });
 
     const project = await projectService.create({
       name,
@@ -26,7 +29,11 @@ export async function handleProjectCreateModal(interaction) {
 
     const projects = await projectService.listByUser(user.id);
     const { content, components } = renderProjectManager(projects, project.id);
-    await interaction.editReply({ content, components, flags: MessageFlags.Ephemeral });
+    await interaction.editReply({
+      content,
+      components,
+      flags: MessageFlags.Ephemeral, // Ensure it remains ephemeral
+    });
     await interaction.followUp({
       content: `✅ Project **${project?.name}** created successfully.`,
       flags: MessageFlags.Ephemeral,
@@ -39,6 +46,9 @@ export async function handleProjectCreateModal(interaction) {
     );
   } catch (err) {
     console.error("Create project modal error:", err);
-    await interaction.editReply("Something went wrong while creating the project.");
+    await interaction.editReply({
+      content: "Something went wrong while creating the project.",
+      flags: MessageFlags.Ephemeral,
+    });
   }
 }
