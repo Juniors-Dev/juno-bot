@@ -6,6 +6,8 @@ import { projectDeleteCancelHandler } from "../features/projectHelper/project-ca
 import { projectDeleteConfirmHandler } from "../features/projectHelper/project-confirm-delete-handler.js";
 import { projectCreateLinkModal } from "../features/projectHelper/links/project-link-create-modal.js";
 import { projectLinkManager } from "../features/projectHelper/links/project-links.js";
+import { projectArchiveHandler } from "../features/projectHelper/project-archive-handler.js";
+import { projectRestoreHandler } from "../features/projectHelper/project-restore-handler.js";
 
 export const buttonHandlers = {
   create_user_modal_button: {
@@ -38,6 +40,14 @@ export const buttonHandlers = {
   },
   confirm_project_delete: {
     run: projectDeleteConfirmHandler,
+    context: { needsUser: true, needsSession: false },
+  },
+  project_archive: {
+    run: projectArchiveHandler,
+    context: { needsUser: true, needsSession: false },
+  },
+  project_restore: {
+    run: projectRestoreHandler,
     context: { needsUser: true, needsSession: false },
   },
 };
