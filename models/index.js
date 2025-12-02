@@ -16,6 +16,7 @@ const sequelize = new Sequelize(
   process.env.ADMIN_PASSWORD,
   {
     host: process.env.HOST,
+    port: process.env.DB_PORT,
     dialect: process.env.DIALECT,
     logging: false,
     dialectOptions: {

@@ -13,8 +13,28 @@ export default {
     }
 
     try {
+      // ---------- SPECIAL CASE: /health ----------
+      if (interaction.commandName === "health") {
+        console.log("[GLOBAL] running /health without user/session pre-checks");
+        await command.execute(interaction);
+        return;
+      }
+
+      // ---------- NORMAL FLOW FOR OTHER COMMANDS ----------
       const { userService, sessionService } = interaction.services;
-      const user = await userService.getOneDiscordId(interaction.user.id);
+
+      // Get user from DB
+      let user;
+      try {
+        user = await userService.getOneDiscordId(interaction.user.id);
+      } catch (err) {
+        console.error("[GLOBAL] userService.getOneDiscordId failed (DB likely down):", err);
+        await sendReply(interaction, "⚠️ The database seems unavailable. Please try again later.", {
+          ephemeral: true,
+        });
+        return;
+      }
+
       if (!user) {
         await interaction.deferReply({ flags: MessageFlags.Ephemeral });
         const button = new ButtonBuilder()
@@ -24,20 +44,28 @@ export default {
 
         const row = new ActionRowBuilder().addComponents(button);
 
-        return interaction.editReply({
+        await interaction.editReply({
           content: "You’re not in the database yet. Click below to create a profile.",
           components: [row],
         });
+        return;
       }
 
-      const session = await sessionService.getOneActive(user.id);
+      // Get active session
+      let session;
+      try {
+        session = await sessionService.getOneActive(user.id);
+      } catch (err) {
+        console.error("[GLOBAL] sessionService.getOneActive failed (DB likely down):", err);
+        await sendReply(interaction, "⚠️ The database seems unavailable. Please try again later.", {
+          ephemeral: true,
+        });
+        return;
+      }
 
       interaction.context = {
         user,
         session,
-        // settings,
-        // isProDuck,
-        // any other existential baggage your user might have
       };
 
       if (command.guards?.length) {

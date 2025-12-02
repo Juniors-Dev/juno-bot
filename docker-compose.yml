@@ -1,16 +1,18 @@
+version: "3.8"
+
 services:
   db:
-    image: postgres:15
-    container_name: pg_juno_dev
-    restart: always
-    ports:
-      - "5432:5432"
+    image: postgres:16
+    container_name: juno_postgres
+    restart: unless-stopped
     environment:
+      POSTGRES_DB: juno_time_dev
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: secret
-      POSTGRES_DB: juno_time_dev
+    ports:
+      - "5434:5432" # host:container
     volumes:
-      - pg_data:/var/lib/postgresql/data
+      - juno_pgdata:/var/lib/postgresql/data
 
 volumes:
-  pg_data:
+  juno_pgdata:

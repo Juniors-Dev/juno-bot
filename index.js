@@ -28,18 +28,41 @@ const client = new Client({
 client.commands = new Collection();
 
 // ---- Database Initialization (Phase 1: Sync) ----
-console.log("Initializing database...");
-await adminDb.sequelize.authenticate();
-console.log("✓ Database connected.");
+// console.log("Initializing database...");
+// await adminDb.sequelize.authenticate();
+// console.log("✓ Database connected.");
 
-if (process.env.NODE_ENV !== "production") {
-  await adminDb.sequelize.sync({ alter: true });
-  console.log("✓ Database synced.");
+// if (process.env.NODE_ENV !== "production") {
+//   await adminDb.sequelize.sync({ alter: true });
+//   console.log("✓ Database synced.");
+// }
+
+console.log("Initializing database...");
+let dbInitOk = false;
+
+try {
+  await adminDb.sequelize.authenticate();
+  console.log("✓ Database connected.");
+
+  if (process.env.NODE_ENV !== "production") {
+    await adminDb.sequelize.sync({ alter: true });
+    console.log("✓ Database synced.");
+  }
+
+  dbInitOk = true;
+} catch (err) {
+  console.error("✗ Failed to connect/sync database at startup:", err);
+  console.error("   The bot will still start, but /health will show DB as 🔴 when down.");
 }
 
 // Attach services to interactions for calling on interaction.services[service]
+// client.prependListener(Events.InteractionCreate, (interaction) => {
+//   interaction.services = services;
+// });
+
 client.prependListener(Events.InteractionCreate, (interaction) => {
   interaction.services = services;
+  interaction.db = adminDb;
 });
 
 // Load commands, events & add cron jobs
