@@ -1,5 +1,6 @@
 import { MessageFlags } from "discord.js";
 import { displayActiveProjects } from "../../../../utils/displayProjects.js";
+import { renderProjectManager } from "../../../../utils/renderProjectManager.js";
 
 export async function handleProjectCreateModal(interaction) {
   if (!interaction.isModalSubmit()) return;
@@ -23,7 +24,13 @@ export async function handleProjectCreateModal(interaction) {
       ownerId: user.id,
     });
 
-    await interaction.editReply(`✅ Project **${project?.name}** created successfully.`);
+    const projects = await projectService.listByUser(user.id);
+    const { content, components } = renderProjectManager(projects, project.id);
+    await interaction.editReply({ content, components, flags: MessageFlags.Ephemeral });
+    await interaction.followUp({
+      content: `✅ Project **${project?.name}** created successfully.`,
+      flags: MessageFlags.Ephemeral,
+    });
     await displayActiveProjects(
       interaction.client,
       projectService,
