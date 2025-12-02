@@ -55,6 +55,8 @@ export async function handleProjectLinkCreateModal(interaction) {
       description,
       userId: user.id,
     });
+    if (!selectedProject.links) selectedProject.links = [];
+    selectedProject.links.push(link);
 
     const { content, components } = renderLinkManager({
       projects: existingProjects,
@@ -63,7 +65,10 @@ export async function handleProjectLinkCreateModal(interaction) {
     });
 
     await interaction.editReply({ content, components });
-    await interaction.followUp(`✅ Project link, **${link?.kind}** created successfully.`);
+    await interaction.followUp({
+      content: `✅ Project link, **${link?.kind}** created successfully.`,
+      flags: MessageFlags.Ephemeral,
+    });
     await displayActiveProjects(
       interaction.client,
       projectService,

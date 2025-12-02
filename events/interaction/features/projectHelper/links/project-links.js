@@ -10,7 +10,7 @@ export async function projectLinkManager(interaction) {
     if (!user) return;
     const { projectService } = interaction.services;
     const projects = await projectService.listByUser(user.id);
-    const { content, components } = renderLinkManager({ projects, projectId });
+    const { content, components } = renderLinkManager({ projects, selectedId: projectId });
     await interaction.editReply({
       content,
       components,
