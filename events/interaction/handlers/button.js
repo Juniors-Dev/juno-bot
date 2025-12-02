@@ -4,6 +4,8 @@ import { projectCreateModal } from "../features/projectHelper/project-create-mod
 import { projectDeleteConfirmation } from "../features/projectHelper/project-delete.js";
 import { projectDeleteCancelHandler } from "../features/projectHelper/project-cancel-delete-handler.js";
 import { projectDeleteConfirmHandler } from "../features/projectHelper/project-confirm-delete-handler.js";
+import { projectCreateLinkModal } from "../features/projectHelper/links/project-link-create-modal.js";
+import { projectLinkManager } from "../features/projectHelper/links/project-links.js";
 
 export const buttonHandlers = {
   create_user_modal_button: {
@@ -16,6 +18,14 @@ export const buttonHandlers = {
   },
   project_create: {
     run: projectCreateModal,
+    context: { needsUser: true, needsSession: false },
+  },
+  project_links: {
+    run: projectLinkManager,
+    context: { needsUser: true, needsSession: false },
+  },
+  project_link_create: {
+    run: projectCreateLinkModal,
     context: { needsUser: true, needsSession: false },
   },
   project_delete: {

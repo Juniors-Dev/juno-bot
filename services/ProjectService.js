@@ -59,6 +59,11 @@ export default class ProjectService {
             },
           ],
         },
+        {
+          model: this.Link,
+          as: "links",
+          attributes: ["id", "kind", "url", "description"],
+        },
       ],
       order: [["updatedAt", "DESC"]],
     });
@@ -72,6 +77,11 @@ export default class ProjectService {
           model: this.ProjectMember,
           as: "projectMembers",
           where: { userId },
+        },
+        {
+          model: this.Link,
+          as: "links",
+          attributes: ["id", "kind", "url", "description"],
         },
       ],
       order: [["updatedAt", "DESC"]],
