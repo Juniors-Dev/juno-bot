@@ -8,6 +8,7 @@ import { projectCreateLinkModal } from "../features/projectHelper/links/project-
 import { projectLinkManager } from "../features/projectHelper/links/project-links.js";
 import { projectArchiveHandler } from "../features/projectHelper/project-archive-handler.js";
 import { projectRestoreHandler } from "../features/projectHelper/project-restore-handler.js";
+import { projectEditModal } from "../features/projectHelper/project-edit-modal.js";
 
 export const buttonHandlers = {
   create_user_modal_button: {
@@ -48,6 +49,10 @@ export const buttonHandlers = {
   },
   project_restore: {
     run: projectRestoreHandler,
+    context: { needsUser: true, needsSession: false },
+  },
+  project_edit: {
+    run: projectEditModal,
     context: { needsUser: true, needsSession: false },
   },
 };

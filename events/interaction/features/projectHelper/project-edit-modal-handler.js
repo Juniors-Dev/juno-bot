@@ -2,40 +2,48 @@ import { MessageFlags } from "discord.js";
 import { displayActiveProjects } from "../../../../utils/displayProjects.js";
 import { renderProjectManager } from "../../../../utils/renderProjectManager.js";
 
-export async function handleProjectCreateModal(interaction) {
+export async function handleProjectEditModal(interaction) {
   if (!interaction.isModalSubmit()) return;
-  if (interaction.customId !== "create_project_modal") return;
+  const [customId, projectId] = interaction.customId.split(":");
+  if (customId !== "edit_project_modal") return;
+  if (!projectId) return;
   if (!interaction.botContext.user) return;
-  const { projectService, userService } = interaction.services;
+
+  const { projectService } = interaction.services;
   const name = interaction.fields.getTextInputValue("name").trim();
   const description = interaction.fields.getTextInputValue("description").trim();
+  await interaction.deferUpdate({ flags: MessageFlags.Ephemeral });
 
   try {
-    const user = await userService.getOneDiscordId(interaction.user.id);
+    const { user } = interaction.botContext;
     const existingProjects = await projectService.listByUser(user.id);
     if (existingProjects.some((p) => p.name.toLowerCase() === name.toLowerCase())) {
-      return interaction.reply({
-        content: "You already have a project with that name.",
+      await interaction.followUp({
+        content:
+          "❌ You already have another project with that name. Please choose a different one.",
         flags: MessageFlags.Ephemeral,
       });
+      return;
     }
-    await interaction.deferUpdate({ flags: MessageFlags.Ephemeral });
 
-    const project = await projectService.create({
-      name,
-      description,
-      ownerId: user.id,
+    const updatedProject = await projectService.update({
+      id: projectId,
+      userId: user.id,
+      args: {
+        name,
+        description,
+      },
     });
 
     const projects = await projectService.listByUser(user.id);
-    const { content, components } = renderProjectManager(projects, project.id);
+    const { content, components } = renderProjectManager(projects, projectId);
     await interaction.editReply({
       content,
       components,
-      flags: MessageFlags.Ephemeral, // Ensure it remains ephemeral
+      flags: MessageFlags.Ephemeral,
     });
     await interaction.followUp({
-      content: `✅ Project **${project?.name}** created successfully.`,
+      content: `✅ Project **${updatedProject?.name}** updated successfully.`,
       flags: MessageFlags.Ephemeral,
     });
     await displayActiveProjects(
@@ -45,9 +53,9 @@ export async function handleProjectCreateModal(interaction) {
       "1435979361009406012",
     );
   } catch (err) {
-    console.error("Create project modal error:", err);
+    console.error("Edit project modal error:", err);
     await interaction.editReply({
-      content: "Something went wrong while creating the project.",
+      content: `Something went wrong while editing the project: ${err.message || "Unknown error."}`,
       flags: MessageFlags.Ephemeral,
     });
   }
