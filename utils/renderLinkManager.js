@@ -45,8 +45,6 @@ export function renderLinkManager({
   if (selected) {
     const hasLinks = selected.links && selected.links.length > 0;
     let linkDropdownRow = null;
-
-    // --- 3. Link Select Menu (Only if links exist) ---
     if (hasLinks) {
       const linkSelect = new StringSelectMenuBuilder()
         .setCustomId(`project_links_select:${selectedId}`)
@@ -61,40 +59,37 @@ export function renderLinkManager({
         );
       linkDropdownRow = new ActionRowBuilder().addComponents(linkSelect);
     } else {
-      // Inform user if no links exist for the selected project
       content += "\n⚠️ **No links found.** Use the 'Add Link' button below.";
     }
 
     // --- 4. Link Actions ---
     const linkActions = new ActionRowBuilder().addComponents(
-      // ➕ Create Link (Always enabled if a project is selected)
       new ButtonBuilder()
         .setCustomId(`project_link_create:${selectedId}`)
         .setLabel("➕ Add Link")
         .setStyle(ButtonStyle.Success),
 
-      // ✏️ Edit Link (Enabled only if a specific link is selected)
       new ButtonBuilder()
-        .setCustomId(`project_link_edit:${linkId}`) // Use project_link_edit for clarity
+        .setCustomId(`project_link_edit:${linkId}:${selectedId}`) // Use project_link_edit for clarity
         .setLabel("✏️ Edit Link")
         .setStyle(ButtonStyle.Primary)
         .setDisabled(!linkId),
     );
-
+    console.log(selectedId);
     // --- 5. Delete/Confirm/Cancel Buttons ---
     const deleteBtn = new ButtonBuilder()
-      .setCustomId(`project_link_delete:${linkId}`)
+      .setCustomId(`project_link_delete:${linkId}:${selectedId}`)
       .setLabel("🗑️ Delete Link")
       .setStyle(ButtonStyle.Danger)
       .setDisabled(!linkId);
 
     const confirmBtn = new ButtonBuilder()
-      .setCustomId(`confirm_project_link_delete:${linkId}`)
+      .setCustomId(`confirm_project_link_delete:${linkId}:${selectedId}`)
       .setLabel("🗑️ Confirm Delete")
       .setStyle(ButtonStyle.Danger);
 
     const cancelBtn = new ButtonBuilder()
-      .setCustomId(`cancel_project_link_delete:${selectedId}`)
+      .setCustomId(`cancel_project_link_delete:${linkId}:${selectedId}`)
       .setLabel("❌ Cancel")
       .setStyle(ButtonStyle.Secondary);
 
@@ -104,7 +99,6 @@ export function renderLinkManager({
     );
 
     // --- Assemble Final Components ---
-    // Push the link-specific rows conditionally
     if (linkDropdownRow) components.push(linkDropdownRow);
     components.push(linkActions);
     components.push(dangerZoneActions);

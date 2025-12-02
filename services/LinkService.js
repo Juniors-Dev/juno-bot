@@ -22,6 +22,12 @@ export default class LinkService {
     return this.Link.create({ projectId, kind, url, description });
   }
 
+  async linkById(linkId) {
+    return this.Link.findOne({
+      where: { id: linkId },
+    });
+  }
+
   async listByProject(projectId) {
     return this.Link.findAll({
       where: { projectId },
@@ -31,7 +37,10 @@ export default class LinkService {
   async update({ projectId, userId, linkId, args }) {
     const project = await this.Project.findOne({
       where: { id: projectId },
-      include: [{ model: this.ProjectMember, as: "projectMembers" }],
+      include: [
+        { model: this.ProjectMember, as: "projectMembers" },
+        { model: this.Link, as: "links" },
+      ],
     });
     if (!project) throw new Error("Project not found.");
     const member = project.projectMembers.find((m) => m.userId === userId);
@@ -40,8 +49,8 @@ export default class LinkService {
     if (!member.isAdmin && !member.canAddLinks) {
       throw new Error("You don’t have permission to edit links.");
     }
-
-    const link = await this.Link.findOne({ where: { id: linkId, projectId } });
+    console.log(linkId);
+    const link = project.links.find((l) => l.id == linkId);
     if (!link) throw new Error("Link not found in this project.");
 
     const allowedFields = ["kind", "url", "description"];
@@ -52,9 +61,16 @@ export default class LinkService {
       }
     }
 
-    await this.Link.update(updateData, { where: { id: linkId } });
+    const [rowsAffected, [updatedLink]] = await this.Link.update(updateData, {
+      where: { id: link.id },
+      returning: true,
+    });
 
-    return this.listByProject(projectId);
+    if (rowsAffected === 0) {
+      throw new Error("Link update failed or link not found.");
+    }
+
+    return updatedLink;
   }
 
   async delete({ projectId, userId, linkId }) {
