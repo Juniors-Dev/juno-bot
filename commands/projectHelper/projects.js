@@ -15,8 +15,8 @@ export default {
   async execute(interaction) {
     await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
-    const { projectService, userService } = interaction.services;
-    const user = await userService.getOneDiscordId(interaction.user.id);
+    const { projectService} = interaction.services;
+    const { user } = interaction.botContext;
     const projects = await projectService.listByUser(user.id);
 
     // --- No projects yet ---
