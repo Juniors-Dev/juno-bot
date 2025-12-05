@@ -25,7 +25,7 @@ export async function handleClockOutButton(interaction) {
     const payload = buildClockOutMessagePayload(result);
     return interaction.editReply(payload);
   } catch (err) {
-    console.error("Guard: Clock-out button error:", err);
+    console.error("[Session Guard] Clock-out button error:", err);
     return interaction.followUp({
       content: "Errmmm you broke something wasn't me! 👀",
       flags: MessageFlags.Ephemeral,
