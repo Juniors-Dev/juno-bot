@@ -46,7 +46,7 @@ export async function handleClockInModal(interaction) {
       }
 
       return interaction.editReply({
-        content: "You're already clocked in. Use `/clock-out` when you're done.",
+        content: "You're already clocked in.",
       });
     }
 
