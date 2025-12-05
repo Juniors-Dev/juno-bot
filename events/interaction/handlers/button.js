@@ -14,7 +14,7 @@ export const buttonHandlers = {
   },
   clock_out_button: {
     run: handleClockOutButton,
-    context: { needsUser: true, needsSession: true },
+    context: { needsUser: true, needsSession: false },
   },
   timer: {
     run: handleTimerButtons,
