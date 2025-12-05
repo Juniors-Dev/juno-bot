@@ -2,6 +2,7 @@ import { ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder } from
 import {
   DEFAULT_SESSION_MINUTES,
   MAX_SESSION_MINUTES,
+  MIN_SESSION_MINUTES,
 } from "../../../../features/session/constants.js";
 
 export async function handleClockInButton(interaction) {
@@ -16,7 +17,7 @@ export async function handleClockInButton(interaction) {
 
   const durationInput = new TextInputBuilder()
     .setCustomId("duration")
-    .setLabel(`How long will you work? (10-${MAX_SESSION_MINUTES} minutes)`)
+    .setLabel(`How long will you work? (${MIN_SESSION_MINUTES}-${MAX_SESSION_MINUTES} minutes)`)
     .setStyle(TextInputStyle.Short)
     .setRequired(false)
     .setPlaceholder(`defaults to ${DEFAULT_SESSION_MINUTES} minutes`);
