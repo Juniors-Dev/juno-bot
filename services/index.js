@@ -4,6 +4,7 @@ import DashboardService from "./DashboardService.js";
 import SessionService from "./SessionService.js";
 import ProjectService from "./ProjectService.js";
 import LinkService from "./LinkService.js";
+import TaskService from "./TaskService.js";
 
 export function createServices(db) {
   return {
@@ -12,6 +13,7 @@ export function createServices(db) {
     sessionService: new SessionService(db),
     projectService: new ProjectService(db),
     linkService: new LinkService(db),
+    taskService: new TaskService(db),
   };
 }
 
