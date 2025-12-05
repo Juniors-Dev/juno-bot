@@ -16,6 +16,5 @@ export async function requireNoActiveSession(interaction) {
     content: "You're already clocked in.",
     components: [row],
   });
-  //TODO: Add clock out button
   return false;
 }
