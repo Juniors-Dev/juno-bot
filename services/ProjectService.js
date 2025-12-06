@@ -47,7 +47,19 @@ export default class ProjectService {
   async listActive() {
     return this.Project.findAll({
       where: { status: "active" },
-      include: [{ model: this.ProjectMember, as: "projectMembers" }],
+      include: [
+        {
+          model: this.ProjectMember,
+          as: "projectMembers",
+          include: [
+            {
+              model: this.User,
+              as: "user",
+              attributes: ["id", "name", "discordId"],
+            },
+          ],
+        },
+      ],
       order: [["updatedAt", "DESC"]],
     });
   }
