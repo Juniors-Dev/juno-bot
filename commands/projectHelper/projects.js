@@ -15,7 +15,7 @@ export default {
   async execute(interaction) {
     await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
-    const { projectService} = interaction.services;
+    const { projectService } = interaction.services;
     const { user } = interaction.botContext;
     const projects = await projectService.listByUser(user.id);
 
