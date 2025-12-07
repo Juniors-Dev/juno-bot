@@ -1,31 +1,21 @@
-import { ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder } from "discord.js";
-import {
-  DEFAULT_SESSION_MINUTES,
-  MAX_SESSION_MINUTES,
-  MIN_SESSION_MINUTES,
-} from "../../../../features/session/constants.js";
+import { MessageFlags } from "discord.js";
+import { buildClockInUI } from "./clock-in-ui.js";
 
 export async function handleClockInButton(interaction) {
-  const modal = new ModalBuilder().setCustomId("clock_in_modal").setTitle("Clock In");
+  const { user } = interaction.botContext;
+  const { taskService } = interaction.services;
 
-  const activityInput = new TextInputBuilder()
-    .setCustomId("activity")
-    .setLabel("What are you working on?")
-    .setStyle(TextInputStyle.Short)
-    .setRequired(false)
-    .setPlaceholder("e.g., peeling potatoes.");
+  await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
-  const durationInput = new TextInputBuilder()
-    .setCustomId("duration")
-    .setLabel(`How long will you work? (${MIN_SESSION_MINUTES}-${MAX_SESSION_MINUTES} minutes)`)
-    .setStyle(TextInputStyle.Short)
-    .setRequired(false)
-    .setPlaceholder(`defaults to ${DEFAULT_SESSION_MINUTES} minutes`);
+  try {
+    const tasks = await taskService.getActiveByUser(user.id, { includeProject: true });
+    const payload = buildClockInUI(tasks);
 
-  modal.addComponents(
-    new ActionRowBuilder().addComponents(activityInput),
-    new ActionRowBuilder().addComponents(durationInput),
-  );
-
-  await interaction.showModal(modal);
+    await interaction.editReply(payload);
+  } catch (err) {
+    console.error("[Clock-in Button] Error:", err);
+    await interaction.editReply({
+      content: "Something went wrong..idk.",
+    });
+  }
 }
