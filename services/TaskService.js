@@ -78,12 +78,12 @@ export default class TaskService {
     }
 
     const statusOrder = this.client.literal(
-      `CASE status
-         WHEN '${TASK_STATUS.TODO}' THEN 1
-         WHEN '${TASK_STATUS.IN_PROGRESS}' THEN 2
-         WHEN '${TASK_STATUS.DONE}' THEN 3
-         WHEN '${TASK_STATUS.ARCHIVED}' THEN 4
-         END`,
+      'CASE "Task"."status" ' +
+        "WHEN 'todo' THEN 1 " +
+        "WHEN 'in_progress' THEN 2 " +
+        "WHEN 'done' THEN 3 " +
+        "WHEN 'archived' THEN 4 " +
+        "END",
     );
 
     const safeLimit = Math.min(Math.max(limit ?? 50, 1), 100);
