@@ -18,7 +18,7 @@ const STATUS_CONFIG = {
 };
 
 const FILTER_OPTIONS = [
-  { label: "Active (Todo + In Progress)", value: "active", emoji: "📋", default: true },
+  { label: "Active (Todo + In Progress)", value: "active", emoji: "📋" },
   { label: "Todo only", value: TASK_STATUS.TODO, emoji: "🟡" },
   { label: "In Progress only", value: TASK_STATUS.IN_PROGRESS, emoji: "🔵" },
   { label: "Done", value: TASK_STATUS.DONE, emoji: "✅" },
