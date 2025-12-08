@@ -6,6 +6,7 @@ import {
   ButtonStyle,
   MessageFlags,
 } from "discord.js";
+import { TASK_STATUS } from "../../../../services/TaskService.js";
 
 /**
  * Build the clock-in task selection UI
@@ -27,7 +28,7 @@ export function buildClockInUI(tasks = [], { selectedTaskId = null } = {}) {
         option.setDescription(truncate(task.project.name, 100));
       }
 
-      const emoji = task.status === "in_progress" ? "🔵" : "🟡";
+      const emoji = task.status === TASK_STATUS.IN_PROGRESS ? "🔵" : "🟡";
       option.setEmoji(emoji);
 
       if (selectedTaskId && String(task.id) === String(selectedTaskId)) {

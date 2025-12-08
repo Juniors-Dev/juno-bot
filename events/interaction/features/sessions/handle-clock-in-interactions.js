@@ -7,6 +7,7 @@ import {
   MAX_SESSION_MINUTES,
   MIN_SESSION_MINUTES,
 } from "../../../../features/session/constants.js";
+import { TASK_STATUS } from "../../../../services/TaskService.js";
 
 function showDurationModal(interaction) {
   const modal = new ModalBuilder().setCustomId("clock_in:duration_modal").setTitle("Clock In");
@@ -107,7 +108,7 @@ export async function handleNewTaskModal(interaction) {
     const task = await taskService.create(user.id, {
       title,
       description,
-      status: "in_progress",
+      status: TASK_STATUS.IN_PROGRESS,
     });
 
     const activity = task.title;
@@ -185,8 +186,8 @@ export async function handleDurationModal(interaction) {
     if (task) {
       await taskService.linkToActiveSession(user.id, task.id);
 
-      if (task.status === "todo") {
-        await taskService.updateStatus(task.id, user.id, "in_progress");
+      if (task.status === TASK_STATUS.TODO) {
+        await taskService.updateStatus(task.id, user.id, TASK_STATUS.IN_PROGRESS);
       }
     }
 
