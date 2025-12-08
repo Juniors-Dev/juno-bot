@@ -81,14 +81,14 @@ export function buildTaskDashboard(
 
         let statusContent = `${config.emoji} **${config.label}** (${statusTasks.length})\n`;
 
-        const preview = statusTasks.slice(0, 20);
+        const preview = statusTasks.slice(0, TASK_PREVIEW_LIMIT);
         for (const task of preview) {
           const projectPrefix = task.project?.name ? `[${task.project.name}] ` : "";
           statusContent += `• ${projectPrefix}${truncate(task.title, 60)}\n`;
         }
 
-        if (statusTasks.length > 20) {
-          statusContent += `_...and ${statusTasks.length - 20} more_`;
+        if (statusTasks.length > TASK_PREVIEW_LIMIT) {
+          statusContent += `_...and ${statusTasks.length - TASK_PREVIEW_LIMIT} more_`;
         }
 
         container.addTextDisplayComponents((textDisplay) => textDisplay.setContent(statusContent));
