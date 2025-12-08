@@ -5,7 +5,8 @@ import {
   TextDisplayBuilder,
 } from "discord.js";
 import { buildTaskDashboard } from "../../events/interaction/features/tasks/task-dashboard-ui.js";
-import { FILTER_STATUS_MAP } from "../../events/interaction/features/tasks/task-dashboard-state.js";
+import { fetchFilteredTasks } from "../../events/interaction/features/tasks/task-dashboard-state.js";
+import { TASK_STATUS } from "../../services/TaskService.js";
 
 export default {
   data: new SlashCommandBuilder()
@@ -18,9 +19,9 @@ export default {
         .setRequired(false)
         .addChoices(
           { name: "Active (Todo + In Progress)", value: "active" },
-          { name: "Todo only", value: "todo" },
-          { name: "In Progress only", value: "in_progress" },
-          { name: "Done", value: "done" },
+          { name: "Todo only", value: TASK_STATUS.TODO },
+          { name: "In Progress only", value: TASK_STATUS.IN_PROGRESS },
+          { name: "Done", value: TASK_STATUS.DONE },
           { name: "All Tasks", value: "all" },
         ),
     ),
@@ -33,13 +34,7 @@ export default {
       const { user } = interaction.botContext;
 
       const filter = interaction.options.getString("filter") || "active";
-      const status = FILTER_STATUS_MAP[filter] ?? FILTER_STATUS_MAP.active;
-
-      const tasks = await taskService.getByUser(user.id, {
-        status,
-        includeProject: true,
-      });
-
+      const tasks = await fetchFilteredTasks(taskService, user.id, filter);
       const payload = buildTaskDashboard(tasks, { filter });
 
       await interaction.editReply(payload);
