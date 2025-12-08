@@ -77,14 +77,14 @@ export function buildTaskDashboard(
 
         let statusContent = `${config.emoji} **${config.label}** (${statusTasks.length})\n`;
 
-        const preview = statusTasks.slice(0, 10);
+        const preview = statusTasks.slice(0, 20);
         for (const task of preview) {
           const projectPrefix = task.project?.name ? `[${task.project.name}] ` : "";
-          statusContent += `• ${projectPrefix}${truncate(task.title, 50)}\n`;
+          statusContent += `• ${projectPrefix}${truncate(task.title, 60)}\n`;
         }
 
-        if (statusTasks.length > 10) {
-          statusContent += `_...and ${statusTasks.length - 10} more_`;
+        if (statusTasks.length > 20) {
+          statusContent += `_...and ${statusTasks.length - 20} more_`;
         }
 
         container.addTextDisplayComponents((textDisplay) => textDisplay.setContent(statusContent));
@@ -120,12 +120,12 @@ export function buildTaskDashboard(
     const taskOptions = selectableTasks.slice(0, 25).map((task) => {
       const config = STATUS_CONFIG[task.status] || STATUS_CONFIG.todo;
       const option = new StringSelectMenuOptionBuilder()
-        .setLabel(truncate(task.title, 100))
+        .setLabel(truncate(task.title, 60))
         .setValue(String(task.id))
         .setEmoji(config.emoji);
 
       if (task.project?.name) {
-        option.setDescription(truncate(task.project.name, 100));
+        option.setDescription(truncate(task.project.name, 60));
       }
 
       if (selectedTaskId && String(task.id) === String(selectedTaskId)) {
@@ -327,7 +327,7 @@ export function buildDeleteConfirmation(task) {
 
   container.addTextDisplayComponents((textDisplay) =>
     textDisplay.setContent(
-      `Are you sure you want to delete **"${truncate(task.title, 50)}"**?\n\n_This cannot be undone._`,
+      `Are you sure you want to delete **"${truncate(task.title, 100)}"**?\n\n_This cannot be undone._`,
     ),
   );
 
