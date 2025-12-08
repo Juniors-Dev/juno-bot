@@ -1,7 +1,13 @@
-/**
- * In-memory state storage
- * Map<userId, { filter: string, selectedTaskId: number|null }>
- */
+import { TASK_STATUS } from "../../../../services/TaskService.js";
+
+export const FILTER_STATUS_MAP = {
+  active: [TASK_STATUS.TODO, TASK_STATUS.IN_PROGRESS],
+  [TASK_STATUS.TODO]: TASK_STATUS.TODO,
+  [TASK_STATUS.IN_PROGRESS]: TASK_STATUS.IN_PROGRESS,
+  [TASK_STATUS.DONE]: TASK_STATUS.DONE,
+  all: null,
+};
+
 const dashboardState = new Map();
 const dashboardStateTimeouts = new Map();
 
@@ -51,22 +57,12 @@ export function clearState(userId) {
  * @returns {Promise<Array>} Filtered tasks with project info
  */
 export async function fetchFilteredTasks(taskService, userId, filter) {
-  const filterMap = {
-    active: ["todo", "in_progress"],
-    todo: "todo",
-    in_progress: "in_progress",
-    done: "done",
-    all: null,
-  };
+  const status = FILTER_STATUS_MAP[filter] ?? FILTER_STATUS_MAP.active;
 
-  const status = filter in filterMap ? filterMap[filter] : ["todo", "in_progress"];
-
-  const tasks = await taskService.getByUser(userId, {
+  return taskService.getByUser(userId, {
     status,
     includeProject: true,
   });
-
-  return tasks;
 }
 
 export async function refreshDashboard(interaction) {
