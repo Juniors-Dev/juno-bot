@@ -5,6 +5,7 @@ import {
   TextDisplayBuilder,
 } from "discord.js";
 import { buildTaskDashboard } from "../../events/interaction/features/tasks/task-dashboard-ui.js";
+import { FILTER_STATUS_MAP } from "../../events/interaction/features/tasks/task-dashboard-state.js";
 
 export default {
   data: new SlashCommandBuilder()
@@ -28,27 +29,16 @@ export default {
     await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
     try {
-      const { taskService, sessionService } = interaction.services;
+      const { taskService } = interaction.services;
       const { user } = interaction.botContext;
 
       const filter = interaction.options.getString("filter") || "active";
-
-      const filterMap = {
-        active: ["todo", "in_progress"],
-        todo: "todo",
-        in_progress: "in_progress",
-        done: "done",
-        all: null,
-      };
-
-      const status = filterMap[filter] ?? ["todo", "in_progress"];
+      const status = FILTER_STATUS_MAP[filter] ?? FILTER_STATUS_MAP.active;
 
       const tasks = await taskService.getByUser(user.id, {
         status,
         includeProject: true,
       });
-
-      const session = await sessionService.getOneActive(user.id);
 
       const payload = buildTaskDashboard(tasks, { filter });
 
