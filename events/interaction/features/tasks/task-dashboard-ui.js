@@ -22,7 +22,7 @@ const FILTER_OPTIONS = [
   { label: "Todo only", value: TASK_STATUS.TODO, emoji: "🟡" },
   { label: "In Progress only", value: TASK_STATUS.IN_PROGRESS, emoji: "🔵" },
   { label: "Done", value: TASK_STATUS.DONE, emoji: "✅" },
-  { label: "All Tasks", value: "all", emoji: "📚" },
+  { label: "All Tasks", value: "all" },
 ];
 
 const DISCORD_SELECT_LIMIT = 25;
@@ -103,10 +103,11 @@ export function buildTaskDashboard(
     .setPlaceholder("Filter tasks")
     .addOptions(
       FILTER_OPTIONS.map((opt) => {
-        const option = new StringSelectMenuOptionBuilder()
-          .setLabel(opt.label)
-          .setValue(opt.value)
-          .setEmoji(opt.emoji);
+        const option = new StringSelectMenuOptionBuilder().setLabel(opt.label).setValue(opt.value);
+
+        if (opt.emoji) {
+          option.setEmoji(opt.emoji);
+        }
 
         if (opt.value === filter) {
           option.setDefault(true);
