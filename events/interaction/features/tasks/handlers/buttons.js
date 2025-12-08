@@ -15,6 +15,7 @@ import {
 import { buildClockInMessagePayload } from "../../../../../features/session/messageBuilder.js";
 import { startTimer } from "../../../../../features/session/timerManager.js";
 import { DEFAULT_SESSION_MINUTES } from "../../../../../features/session/constants.js";
+import { TASK_STATUS } from "../../../../../services/TaskService.js";
 
 async function handleNewTaskButton(interaction) {
   const modal = new ModalBuilder().setCustomId("tasks:new_modal").setTitle("Create New Task");
@@ -140,8 +141,8 @@ async function handleStartWorking(interaction) {
 
     await taskService.linkToActiveSession(user.id, task.id);
 
-    if (task.status === "todo") {
-      await taskService.updateStatus(task.id, user.id, "in_progress");
+    if (task.status === TASK_STATUS.TODO) {
+      await taskService.updateStatus(task.id, user.id, TASK_STATUS.IN_PROGRESS);
     }
 
     startTimer(interaction.client, session, DEFAULT_SESSION_MINUTES);

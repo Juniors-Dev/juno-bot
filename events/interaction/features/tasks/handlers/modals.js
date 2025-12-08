@@ -1,5 +1,6 @@
 import { refreshDashboard } from "../task-dashboard-state.js";
 import { buildTaskDashboard, buildTaskDetail, buildV2Message } from "../task-dashboard-ui.js";
+import { TASK_STATUS } from "../../../../../services/TaskService.js";
 
 async function handleNewTaskModal(interaction) {
   const { user } = interaction.botContext;
@@ -14,7 +15,7 @@ async function handleNewTaskModal(interaction) {
     await taskService.create(user.id, {
       title,
       description,
-      status: "todo",
+      status: TASK_STATUS.TODO,
     });
 
     const { filter, tasks } = await refreshDashboard(interaction);
