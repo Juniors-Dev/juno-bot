@@ -10,7 +10,7 @@ import {
 } from "discord.js";
 import { TASK_STATUS } from "../../../../services/TaskService.js";
 
-const STATUS_CONFIG = {
+export const STATUS_CONFIG = {
   [TASK_STATUS.IN_PROGRESS]: { emoji: "🔵", label: "In Progress", color: 0x3498db },
   [TASK_STATUS.TODO]: { emoji: "🟡", label: "Todo", color: 0xf1c40f },
   [TASK_STATUS.DONE]: { emoji: "✅", label: "Done", color: 0x2ecc71 },

@@ -11,6 +11,7 @@ import {
   buildTaskDetail,
   buildDeleteConfirmation,
   buildV2Message,
+  STATUS_CONFIG,
 } from "../task-dashboard-ui.js";
 import { buildClockInMessagePayload } from "../../../../../features/session/messageBuilder.js";
 import { startTimer } from "../../../../../features/session/timerManager.js";
@@ -94,7 +95,9 @@ async function handleStatusChange(interaction) {
     const task = await taskService.getById(taskId, user.id, { includeProject: true });
     const session = await sessionService.getOneActive(user.id);
 
-    const statusLabel = newStatus.replace("_", " ");
+    const config = STATUS_CONFIG[newStatus];
+    const statusLabel = config.label;
+
     const payload = buildTaskDetail(task, {
       hasActiveSession: !!session,
       notification: `✅ Status updated to **${statusLabel}**`,
