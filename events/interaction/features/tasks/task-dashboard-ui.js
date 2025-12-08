@@ -11,10 +11,10 @@ import {
 import { TASK_STATUS } from "../../../../services/TaskService.js";
 
 const STATUS_CONFIG = {
-  [TASK_STATUS.IN_PROGRESS]: { emoji: "🔵", label: "In Progress", order: 1 },
-  [TASK_STATUS.TODO]: { emoji: "🟡", label: "Todo", order: 2 },
-  [TASK_STATUS.DONE]: { emoji: "✅", label: "Done", order: 3 },
-  [TASK_STATUS.ARCHIVED]: { emoji: "📦", label: "Archived", order: 4 },
+  [TASK_STATUS.IN_PROGRESS]: { emoji: "🔵", label: "In Progress", color: 0x3498db },
+  [TASK_STATUS.TODO]: { emoji: "🟡", label: "Todo", color: 0xf1c40f },
+  [TASK_STATUS.DONE]: { emoji: "✅", label: "Done", color: 0x2ecc71 },
+  [TASK_STATUS.ARCHIVED]: { emoji: "📦", label: "Archived", color: 0x95a5a6 },
 };
 
 const FILTER_OPTIONS = [
@@ -22,7 +22,7 @@ const FILTER_OPTIONS = [
   { label: "Todo only", value: TASK_STATUS.TODO, emoji: "🟡" },
   { label: "In Progress only", value: TASK_STATUS.IN_PROGRESS, emoji: "🔵" },
   { label: "Done", value: TASK_STATUS.DONE, emoji: "✅" },
-  { label: "All Tasks", value: "all", emoji: "📁" },
+  { label: "All Tasks", value: "all", emoji: "📚" },
 ];
 
 const DISCORD_SELECT_LIMIT = 25;
@@ -77,7 +77,7 @@ export function buildTaskDashboard(
     for (const status of statusesToShow) {
       const statusTasks = grouped[status] || [];
       if (statusTasks.length > 0) {
-        const config = STATUS_CONFIG[status];
+        const config = STATUS_CONFIG[status] || STATUS_CONFIG[TASK_STATUS.TODO];
 
         let statusContent = `${config.emoji} **${config.label}** (${statusTasks.length})\n`;
 
@@ -122,7 +122,7 @@ export function buildTaskDashboard(
 
   if (selectableTasks.length > 0) {
     const taskOptions = selectableTasks.slice(0, DISCORD_SELECT_LIMIT).map((task) => {
-      const config = STATUS_CONFIG[task.status] || STATUS_CONFIG.todo;
+      const config = STATUS_CONFIG[task.status] || STATUS_CONFIG[TASK_STATUS.TODO];
       const option = new StringSelectMenuOptionBuilder()
         .setLabel(truncate(task.title, 60))
         .setValue(String(task.id))
@@ -171,23 +171,19 @@ export function buildTaskDashboard(
  * @param {string|null} options.notification - Optional notification message
  */
 export function buildTaskDetail(task, { hasActiveSession = false, notification = null } = {}) {
-  const config = STATUS_CONFIG[task.status] || STATUS_CONFIG.todo;
+  const config = STATUS_CONFIG[task.status] || STATUS_CONFIG[TASK_STATUS.TODO];
   const components = [];
 
   if (notification) {
     components.unshift(buildNotificationComponent(notification, 0x2ecc71));
   }
 
-  const accentColors = {
-    [TASK_STATUS.IN_PROGRESS]: 0x3498db,
-    [TASK_STATUS.TODO]: 0xf1c40f,
-    [TASK_STATUS.DONE]: 0x2ecc71,
-    [TASK_STATUS.ARCHIVED]: 0x95a5a6,
-  };
+  const container = new ContainerBuilder().setAccentColor(config.color || 0x5865f2);
 
-  const container = new ContainerBuilder().setAccentColor(accentColors[task.status] || 0x5865f2);
+  const canStartWorking =
+    !hasActiveSession && task.status !== TASK_STATUS.DONE && task.status !== TASK_STATUS.ARCHIVED;
 
-  if (!hasActiveSession && task.status !== "done" && task.status !== "archived") {
+  if (canStartWorking) {
     container.addSectionComponents((section) =>
       section
         .addTextDisplayComponents((textDisplay) =>
@@ -373,7 +369,7 @@ export function buildV2Message(message, { type = "error" } = {}) {
 
 function groupTasksByStatus(tasks) {
   return tasks.reduce((acc, task) => {
-    const status = task.status || "todo";
+    const status = task.status || TASK_STATUS.TODO;
     if (!acc[status]) acc[status] = [];
     acc[status].push(task);
     return acc;
