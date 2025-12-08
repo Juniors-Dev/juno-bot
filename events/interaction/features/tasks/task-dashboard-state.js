@@ -1,13 +1,5 @@
 import { TASK_STATUS } from "../../../../services/TaskService.js";
 
-export const FILTER_STATUS_MAP = {
-  active: [TASK_STATUS.TODO, TASK_STATUS.IN_PROGRESS],
-  [TASK_STATUS.TODO]: TASK_STATUS.TODO,
-  [TASK_STATUS.IN_PROGRESS]: TASK_STATUS.IN_PROGRESS,
-  [TASK_STATUS.DONE]: TASK_STATUS.DONE,
-  all: null,
-};
-
 const dashboardState = new Map();
 const dashboardStateTimeouts = new Map();
 
@@ -57,7 +49,16 @@ export function clearState(userId) {
  * @returns {Promise<Array>} Filtered tasks with project info
  */
 export async function fetchFilteredTasks(taskService, userId, filter) {
-  const status = FILTER_STATUS_MAP[filter] ?? FILTER_STATUS_MAP.active;
+  const filterMap = {
+    active: [TASK_STATUS.TODO, TASK_STATUS.IN_PROGRESS],
+    [TASK_STATUS.TODO]: TASK_STATUS.TODO,
+    [TASK_STATUS.IN_PROGRESS]: TASK_STATUS.IN_PROGRESS,
+    [TASK_STATUS.DONE]: TASK_STATUS.DONE,
+    all: null,
+  };
+
+  const status =
+    filter in filterMap ? filterMap[filter] : [TASK_STATUS.TODO, TASK_STATUS.IN_PROGRESS];
 
   return taskService.getByUser(userId, {
     status,
