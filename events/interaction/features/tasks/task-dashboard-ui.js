@@ -8,21 +8,25 @@ import {
   ContainerBuilder,
   SeparatorSpacingSize,
 } from "discord.js";
+import { TASK_STATUS } from "../../../../services/TaskService.js";
 
 const STATUS_CONFIG = {
-  in_progress: { emoji: "🔵", label: "In Progress", order: 1 },
-  todo: { emoji: "🟡", label: "Todo", order: 2 },
-  done: { emoji: "✅", label: "Done", order: 3 },
-  archived: { emoji: "📦", label: "Archived", order: 4 },
+  [TASK_STATUS.IN_PROGRESS]: { emoji: "🔵", label: "In Progress", order: 1 },
+  [TASK_STATUS.TODO]: { emoji: "🟡", label: "Todo", order: 2 },
+  [TASK_STATUS.DONE]: { emoji: "✅", label: "Done", order: 3 },
+  [TASK_STATUS.ARCHIVED]: { emoji: "📦", label: "Archived", order: 4 },
 };
 
 const FILTER_OPTIONS = [
   { label: "Active (Todo + In Progress)", value: "active", emoji: "📋", default: true },
-  { label: "Todo only", value: "todo", emoji: "🟡" },
-  { label: "In Progress only", value: "in_progress", emoji: "🔵" },
-  { label: "Done", value: "done", emoji: "✅" },
+  { label: "Todo only", value: TASK_STATUS.TODO, emoji: "🟡" },
+  { label: "In Progress only", value: TASK_STATUS.IN_PROGRESS, emoji: "🔵" },
+  { label: "Done", value: TASK_STATUS.DONE, emoji: "✅" },
   { label: "All Tasks", value: "all", emoji: "📁" },
 ];
+
+const DISCORD_SELECT_LIMIT = 25;
+const TASK_PREVIEW_LIMIT = 20;
 
 /**
  * Build the task dashboard UI (Components v2)
@@ -62,8 +66,8 @@ export function buildTaskDashboard(
 
   const statusesToShow =
     filter === "all"
-      ? ["in_progress", "todo", "done", "archived"]
-      : ["in_progress", "todo", "done"];
+      ? [TASK_STATUS.IN_PROGRESS, TASK_STATUS.TODO, TASK_STATUS.DONE, TASK_STATUS.ARCHIVED]
+      : [TASK_STATUS.IN_PROGRESS, TASK_STATUS.TODO, TASK_STATUS.DONE];
 
   if (tasks.length === 0) {
     container.addTextDisplayComponents((textDisplay) =>
@@ -114,10 +118,10 @@ export function buildTaskDashboard(
 
   components.push(new ActionRowBuilder().addComponents(filterSelect));
 
-  const selectableTasks = tasks.filter((t) => t.status !== "archived");
+  const selectableTasks = tasks.filter((t) => t.status !== TASK_STATUS.ARCHIVED);
 
   if (selectableTasks.length > 0) {
-    const taskOptions = selectableTasks.slice(0, 25).map((task) => {
+    const taskOptions = selectableTasks.slice(0, DISCORD_SELECT_LIMIT).map((task) => {
       const config = STATUS_CONFIG[task.status] || STATUS_CONFIG.todo;
       const option = new StringSelectMenuOptionBuilder()
         .setLabel(truncate(task.title, 60))
@@ -175,10 +179,10 @@ export function buildTaskDetail(task, { hasActiveSession = false, notification =
   }
 
   const accentColors = {
-    in_progress: 0x3498db,
-    todo: 0xf1c40f,
-    done: 0x2ecc71,
-    archived: 0x95a5a6,
+    [TASK_STATUS.IN_PROGRESS]: 0x3498db,
+    [TASK_STATUS.TODO]: 0xf1c40f,
+    [TASK_STATUS.DONE]: 0x2ecc71,
+    [TASK_STATUS.ARCHIVED]: 0x95a5a6,
   };
 
   const container = new ContainerBuilder().setAccentColor(accentColors[task.status] || 0x5865f2);
@@ -239,30 +243,30 @@ export function buildTaskDetail(task, { hasActiveSession = false, notification =
 
   const statusButtons = [];
 
-  if (task.status !== "todo") {
+  if (task.status !== TASK_STATUS.TODO) {
     statusButtons.push(
       new ButtonBuilder()
-        .setCustomId(`tasks:status:todo:${task.id}`)
+        .setCustomId(`tasks:status:${TASK_STATUS.TODO}:${task.id}`)
         .setLabel("Todo")
         .setStyle(ButtonStyle.Secondary)
         .setEmoji("🟡"),
     );
   }
 
-  if (task.status !== "in_progress") {
+  if (task.status !== TASK_STATUS.IN_PROGRESS) {
     statusButtons.push(
       new ButtonBuilder()
-        .setCustomId(`tasks:status:in_progress:${task.id}`)
+        .setCustomId(`tasks:status:${TASK_STATUS.IN_PROGRESS}:${task.id}`)
         .setLabel("In Progress")
         .setStyle(ButtonStyle.Secondary)
         .setEmoji("🔵"),
     );
   }
 
-  if (task.status !== "done") {
+  if (task.status !== TASK_STATUS.DONE) {
     statusButtons.push(
       new ButtonBuilder()
-        .setCustomId(`tasks:status:done:${task.id}`)
+        .setCustomId(`tasks:status:${TASK_STATUS.DONE}:${task.id}`)
         .setLabel("Done")
         .setStyle(ButtonStyle.Secondary)
         .setEmoji("✅"),
@@ -280,7 +284,7 @@ export function buildTaskDetail(task, { hasActiveSession = false, notification =
       .setStyle(ButtonStyle.Secondary),
   ];
 
-  if (task.status !== "archived") {
+  if (task.status !== TASK_STATUS.ARCHIVED) {
     actionButtons.push(
       new ButtonBuilder()
         .setCustomId(`tasks:archive:${task.id}`)
