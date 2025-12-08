@@ -95,8 +95,7 @@ async function handleStatusChange(interaction) {
     const task = await taskService.getById(taskId, user.id, { includeProject: true });
     const session = await sessionService.getOneActive(user.id);
 
-    const config = STATUS_CONFIG[newStatus];
-    const statusLabel = config.label;
+    const statusLabel = STATUS_CONFIG[newStatus]?.label || newStatus.replace("_", " ");
 
     const payload = buildTaskDetail(task, {
       hasActiveSession: !!session,
