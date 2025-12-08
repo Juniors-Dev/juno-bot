@@ -49,7 +49,7 @@ export default {
 
       await interaction.editReply({
         components: [errorContainer],
-        flags: MessageFlags.IsComponentsV2,
+        flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
       });
     }
   },
