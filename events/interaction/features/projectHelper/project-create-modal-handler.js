@@ -29,11 +29,7 @@ export async function handleProjectCreateModal(interaction) {
 
     const projects = await projectService.listByUser(user.id);
     const { content, components } = renderProjectManager(projects, project.id);
-    await interaction.editReply({
-      content,
-      components,
-      flags: MessageFlags.Ephemeral, // Ensure it remains ephemeral
-    });
+    await interaction.editReply({ content, components });
     await interaction.followUp({
       content: `✅ Project **${project?.name}** created successfully.`,
       flags: MessageFlags.Ephemeral,

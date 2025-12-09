@@ -17,7 +17,7 @@ export async function handleProjectEditModal(interaction) {
   try {
     const { user } = interaction.botContext;
     const existingProjects = await projectService.listByUser(user.id);
-      const isDuplicate = existingProjects.some(
+    const isDuplicate = existingProjects.some(
       (p) => p.name.toLowerCase() === name.toLowerCase() && String(p.id) !== String(projectId),
     );
     if (isDuplicate) {

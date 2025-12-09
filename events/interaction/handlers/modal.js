@@ -1,6 +1,7 @@
 import { handleCreateUserModal } from "../features/users/handle-user-modal.js";
 import { handleProjectCreateModal } from "../features/projectHelper/project-create-modal-handler.js";
 import { handleProjectEditModal } from "../features/projectHelper/project-edit-modal-handler.js";
+import { handleClockInModal } from "../features/sessions/handle-clock-in-modal.js";
 
 export const modalSubmitHandlers = {
   create_user_modal: {
@@ -13,6 +14,10 @@ export const modalSubmitHandlers = {
   },
   edit_project_modal: {
     run: handleProjectEditModal,
+    context: { needsUser: true, needsSession: false },
+  },
+  clock_in_modal: {
+    run: handleClockInModal,
     context: { needsUser: true, needsSession: false },
   },
 };

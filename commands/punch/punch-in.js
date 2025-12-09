@@ -2,7 +2,11 @@ import { SlashCommandBuilder, MessageFlags } from "discord.js";
 import { buildClockInMessagePayload } from "../../features/session/messageBuilder.js";
 import { startTimer } from "../../features/session/timerManager.js";
 import { requireNoActiveSession } from "../../guards/index.js";
-import { DEFAULT_SESSION_MINUTES, MAX_SESSION_MINUTES } from "../../features/session/constants.js";
+import {
+  DEFAULT_SESSION_MINUTES,
+  MAX_SESSION_MINUTES,
+  MIN_SESSION_MINUTES,
+} from "../../features/session/constants.js";
 
 export default {
   data: new SlashCommandBuilder()
@@ -19,7 +23,7 @@ export default {
         .setName("duration")
         .setDescription("Planned duration in minutes (optional)")
         .setRequired(false)
-        .setMinValue(10)
+        .setMinValue(MIN_SESSION_MINUTES)
         .setMaxValue(MAX_SESSION_MINUTES),
     ),
   guards: [requireNoActiveSession],
