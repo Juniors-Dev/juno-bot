@@ -7,6 +7,8 @@ import {
   MessageFlags,
   ContainerBuilder,
   SeparatorSpacingSize,
+  TimestampStyles,
+  time,
 } from "discord.js";
 import { TASK_STATUS } from "../../../../services/TaskService.js";
 
@@ -231,9 +233,7 @@ export function buildTaskDetail(task, { hasActiveSession = false, notification =
   );
 
   container.addTextDisplayComponents((textDisplay) =>
-    textDisplay.setContent(
-      `_Created <t:${Math.floor(new Date(task.createdAt).getTime() / 1000)}:R>_`,
-    ),
+    textDisplay.setContent(`_Created ${time(task.createdAt, TimestampStyles.RelativeTime)}_`),
   );
 
   components.push(container);
