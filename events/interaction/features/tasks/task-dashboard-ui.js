@@ -228,16 +228,6 @@ export function buildTaskDetail(task, { hasActiveSession = false, notification =
     container.addTextDisplayComponents((textDisplay) => textDisplay.setContent(task.description));
   }
 
-  container.addSeparatorComponents((separator) =>
-    separator.setSpacing(SeparatorSpacingSize.Small).setDivider(true),
-  );
-
-  container.addTextDisplayComponents((textDisplay) =>
-    textDisplay.setContent(`_Created ${time(task.createdAt, TimestampStyles.RelativeTime)}_`),
-  );
-
-  components.push(container);
-
   const statusButtons = [];
 
   if (task.status !== TASK_STATUS.TODO) {
@@ -271,8 +261,26 @@ export function buildTaskDetail(task, { hasActiveSession = false, notification =
   }
 
   if (statusButtons.length > 0) {
-    components.push(new ActionRowBuilder().addComponents(statusButtons));
+    container.addSeparatorComponents((separator) =>
+      separator.setSpacing(SeparatorSpacingSize.Large).setDivider(false),
+    );
+
+    container.addTextDisplayComponents((textDisplay) =>
+      textDisplay.setContent("**Change status:**"),
+    );
+
+    container.addActionRowComponents(new ActionRowBuilder().addComponents(statusButtons));
   }
+
+  container.addSeparatorComponents((separator) =>
+    separator.setSpacing(SeparatorSpacingSize.Small).setDivider(true),
+  );
+
+  container.addTextDisplayComponents((textDisplay) =>
+    textDisplay.setContent(`_Created ${time(task.createdAt, TimestampStyles.RelativeTime)}_`),
+  );
+
+  components.push(container);
 
   const actionButtons = [
     new ButtonBuilder()
