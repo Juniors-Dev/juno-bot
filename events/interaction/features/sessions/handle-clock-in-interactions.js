@@ -210,7 +210,7 @@ export async function handleDurationModal(interaction) {
   }
 }
 
-export async function handleClockInButtons(interaction) {
+export async function handleClockingInButtons(interaction) {
   const [, action] = interaction.customId.split(":");
 
   switch (action) {
