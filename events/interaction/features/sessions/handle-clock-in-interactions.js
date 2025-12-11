@@ -27,7 +27,6 @@ function showDurationModal(interaction) {
 export async function handleTaskSelect(interaction) {
   const selectedTaskId = interaction.values[0] ?? null;
   setClockInState(interaction.user.id, { taskId: selectedTaskId });
-
   await interaction.deferUpdate();
 }
 
@@ -121,7 +120,6 @@ export async function handleNewTaskModal(interaction) {
     await taskService.linkToActiveSession(user.id, task.id);
 
     startTimer(interaction.client, session, duration);
-
     clearClockInState(interaction.user.id);
 
     const payload = buildClockInMessagePayload({
@@ -161,7 +159,6 @@ export async function handleDurationModal(interaction) {
 
     let activity = null;
     let task = null;
-
     if (taskId) {
       task = await taskService.getById(taskId, user.id, { includeProject: true });
       if (task) {
