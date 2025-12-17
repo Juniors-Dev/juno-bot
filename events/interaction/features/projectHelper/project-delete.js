@@ -1,4 +1,3 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 import { renderProjectManager } from "../../../../utils/renderProjectManager.js";
 
 export async function projectDeleteConfirmation(interaction) {
