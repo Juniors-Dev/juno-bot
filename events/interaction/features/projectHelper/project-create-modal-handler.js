@@ -5,13 +5,13 @@ import { renderProjectManager } from "../../../../utils/renderProjectManager.js"
 export async function handleProjectCreateModal(interaction) {
   if (!interaction.isModalSubmit()) return;
   if (interaction.customId !== "create_project_modal") return;
-  if (!interaction.botContext.user) return;
-  const { projectService, userService } = interaction.services;
+  const user = interaction.botContext.user;
+  if (!user) return;
+  const { projectService } = interaction.services;
   const name = interaction.fields.getTextInputValue("name").trim();
   const description = interaction.fields.getTextInputValue("description").trim();
 
   try {
-    const user = await userService.getOneDiscordId(interaction.user.id);
     const existingProjects = await projectService.listByUser(user.id);
     if (existingProjects.some((p) => p.name.toLowerCase() === name.toLowerCase())) {
       return interaction.reply({

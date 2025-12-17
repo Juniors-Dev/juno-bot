@@ -17,7 +17,7 @@ import { TASK_STATUS } from "../../../../services/TaskService.js";
  */
 export function buildClockInUI(tasks = [], { selectedTaskId = null } = {}) {
   const components = [];
-  
+
   if (tasks.length > 0) {
     const taskOptions = tasks.slice(0, 25).map((task) => {
       const option = new StringSelectMenuOptionBuilder()
@@ -33,7 +33,7 @@ export function buildClockInUI(tasks = [], { selectedTaskId = null } = {}) {
       }
       return option;
     });
-    
+
     const taskSelect = new StringSelectMenuBuilder()
       .setCustomId("clock_in:task_select")
       .setPlaceholder("Select a task to work on")
@@ -42,7 +42,7 @@ export function buildClockInUI(tasks = [], { selectedTaskId = null } = {}) {
       .addOptions(taskOptions);
     components.push(new ActionRowBuilder().addComponents(taskSelect));
   }
-  
+
   const buttons = [];
   if (tasks.length > 0) {
     buttons.push(
@@ -53,7 +53,7 @@ export function buildClockInUI(tasks = [], { selectedTaskId = null } = {}) {
         .setEmoji("▶️"),
     );
   }
-  
+
   buttons.push(
     new ButtonBuilder()
       .setCustomId("clock_in:skip")
@@ -61,7 +61,7 @@ export function buildClockInUI(tasks = [], { selectedTaskId = null } = {}) {
       .setStyle(tasks.length > 0 ? ButtonStyle.Secondary : ButtonStyle.Success)
       .setEmoji(tasks.length > 0 ? "⏭️" : "▶️"),
   );
-  
+
   buttons.push(
     new ButtonBuilder()
       .setCustomId("clock_in:new_task")
@@ -69,7 +69,7 @@ export function buildClockInUI(tasks = [], { selectedTaskId = null } = {}) {
       .setStyle(ButtonStyle.Secondary)
       .setEmoji("➕"),
   );
-  
+
   buttons.push(
     new ButtonBuilder()
       .setCustomId("clock_in:cancel")
@@ -77,10 +77,10 @@ export function buildClockInUI(tasks = [], { selectedTaskId = null } = {}) {
       .setStyle(ButtonStyle.Secondary),
   );
   components.push(new ActionRowBuilder().addComponents(buttons));
-  
+
   const taskCount = tasks.length;
   let content = "## ⏱️ Clock In\n\n";
-  
+
   if (taskCount > 0) {
     content += `You have **${taskCount}** active task${taskCount === 1 ? "" : "s"}.\n`;
     content += "Select a task or skip to clock in without one.";

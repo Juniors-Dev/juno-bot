@@ -64,8 +64,9 @@ export default class ProjectService {
     });
   }
 
-  async listByUser(userId) {
+  async listByUser(userId, where = {}) {
     return this.Project.findAll({
+      where,
       include: [
         {
           model: this.ProjectMember,
@@ -104,6 +105,28 @@ export default class ProjectService {
         { model: this.ProjectMember, as: "projectMembers" },
         { model: this.Link, as: "links" },
       ],
+    });
+  }
+
+  // HARD DELETE
+  async delete({ id, userId }) {
+    return this.client.transaction(async (t) => {
+      const project = await this.Project.findOne({
+        where: { id },
+        include: [{ model: this.ProjectMember, as: "projectMembers" }],
+        transaction: t,
+      });
+
+      if (!project) throw new Error("Project not found.");
+
+      const member = project.projectMembers.find((m) => m.userId === userId);
+      if (!member?.isAdmin) throw new Error("You don't have permission to delete this project.");
+
+      await this.ProjectMember.destroy({ where: { projectId: id }, transaction: t });
+      await this.Link.destroy({ where: { projectId: id }, transaction: t });
+      await project.destroy({ transaction: t });
+
+      return true;
     });
   }
 
