@@ -27,6 +27,5 @@ export async function projectDeleteConfirmHandler(interaction) {
   } catch (err) {
     console.error("Delete project error:", err);
     await replyEphemeral(interaction, "❌ Something went wrong deleting the project.");
-    });
   }
 }

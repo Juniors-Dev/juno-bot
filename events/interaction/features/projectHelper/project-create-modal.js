@@ -3,6 +3,7 @@ import { ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder } from
 export async function projectCreateModal(interaction) {
   if (interaction.customId !== "project_create") return;
   if (!interaction.botContext.user) return;
+
   const modal = new ModalBuilder()
     .setCustomId("create_project_modal")
     .setTitle("Create New Project");
