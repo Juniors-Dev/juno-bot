@@ -1,7 +1,7 @@
 import { MessageFlags } from "discord.js";
 import { displayActiveProjects } from "../../../../utils/displayProjects.js";
 import { renderProjectManager } from "../../../../utils/renderProjectManager.js";
-
+import { replyEphemeral } from "../../../../utils/reply.js";
 export async function projectDeleteConfirmHandler(interaction) {
   if (!interaction.customId.startsWith("confirm_project_delete:")) return;
   const projectId = interaction.customId.split(":")[1];
