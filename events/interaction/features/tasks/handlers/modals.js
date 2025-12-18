@@ -11,18 +11,22 @@ async function handleNewTaskModal(interaction) {
   try {
     const title = interaction.fields.getTextInputValue("title");
     const description = interaction.fields.getTextInputValue("description") || null;
+    const projectId = getProjectIdFromModal(interaction);
 
     await taskService.create(user.id, {
       title,
       description,
       status: TASK_STATUS.TODO,
+      projectId,
     });
 
     const { filter, tasks } = await refreshDashboard(interaction);
+
     const payload = buildTaskDashboard(tasks, {
       filter,
       notification: `✅ Task created: **${title}**`,
     });
+
     await interaction.editReply(payload);
   } catch (err) {
     console.error("[Task Dashboard] New task error:", err);
@@ -41,10 +45,12 @@ async function handleEditModal(interaction) {
   try {
     const title = interaction.fields.getTextInputValue("title");
     const description = interaction.fields.getTextInputValue("description") || null;
+    const projectId = getProjectIdFromModal(interaction);
 
     const updatedTask = await taskService.update(taskId, user.id, {
       title,
       description,
+      projectId,
     });
 
     if (!updatedTask) {
@@ -80,5 +86,19 @@ export async function handleTaskModals(interaction) {
       return handleEditModal(interaction);
     default:
       console.warn(`[Task Dashboard] Unknown modal action: ${action}`);
+  }
+}
+
+function getProjectIdFromModal(interaction) {
+  try {
+    const values = interaction.fields.getStringSelectValues("project_select");
+
+    if (!values || values.length === 0) {
+      return null;
+    }
+    const value = values[0];
+    return value === "no_project" ? null : value;
+  } catch (err) {
+    return null;
   }
 }
