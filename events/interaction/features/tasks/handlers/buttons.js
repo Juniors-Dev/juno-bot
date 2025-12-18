@@ -11,6 +11,7 @@ import {
   buildTaskDetail,
   buildDeleteConfirmation,
   buildV2Message,
+  buildProjectSelectForModal,
   STATUS_CONFIG,
 } from "../task-dashboard-ui.js";
 import { buildClockInMessagePayload } from "../../../../../features/session/messageBuilder.js";
@@ -19,6 +20,9 @@ import { DEFAULT_SESSION_MINUTES } from "../../../../../features/session/constan
 import { TASK_STATUS } from "../../../../../services/TaskService.js";
 
 async function handleNewTaskButton(interaction) {
+  const { user } = interaction.botContext;
+  const { projectService } = interaction.services;
+
   const modal = new ModalBuilder().setCustomId("tasks:new_modal").setTitle("Create New Task");
 
   const titleInput = new TextInputBuilder()
@@ -37,24 +41,24 @@ async function handleNewTaskButton(interaction) {
     .setMaxLength(1000)
     .setPlaceholder("Add any notes or details...");
 
-  modal.addComponents(
-    new ActionRowBuilder().addComponents(titleInput),
-    new ActionRowBuilder().addComponents(descriptionInput),
-  );
-
-  await interaction.showModal(modal);
-}
-
-async function handleRefreshButton(interaction) {
-  await interaction.deferUpdate();
+  const titleRow = new ActionRowBuilder().addComponents(titleInput);
+  const descriptionRow = new ActionRowBuilder().addComponents(descriptionInput);
 
   try {
-    const { filter, tasks } = await refreshDashboard(interaction);
-    const payload = buildTaskDashboard(tasks, { filter });
-    await interaction.editReply(payload);
+    const projects = await projectService.listByUser(user.id, { status: "active" });
+    const rows = [titleRow, descriptionRow];
+
+    if (projects.length > 0) {
+      const projectSelect = buildProjectSelectForModal(projects);
+      rows.push(new ActionRowBuilder().addComponents(projectSelect));
+    }
+
+    modal.addComponents(...rows);
+    await interaction.showModal(modal);
   } catch (err) {
-    console.error("[Task Dashboard] Refresh error:", err);
-    await interaction.editReply(buildV2Message("Something went wrong refreshing tasks."));
+    console.error("[Task Dashboard] New Task Modal Error:", err);
+    modal.addComponents(titleRow, descriptionRow);
+    await interaction.showModal(modal);
   }
 }
 
@@ -171,15 +175,17 @@ async function handleStartWorking(interaction) {
 
 async function handleEditButton(interaction) {
   const { user } = interaction.botContext;
-  const { taskService } = interaction.services;
+  const { taskService, projectService } = interaction.services;
 
   const taskId = parseInt(interaction.customId.split(":")[2], 10);
 
   try {
-    const task = await taskService.getById(taskId, user.id);
+    const task = await taskService.getById(taskId, user.id, { includeProject: true });
 
     if (!task) {
-      await interaction.reply({ ...buildV2Message("⚠️ Task not found.", { type: "warning" }) });
+      await interaction.reply({
+        ...buildV2Message("⚠️ Task not found.", { type: "warning" }),
+      });
       return;
     }
 
@@ -203,11 +209,25 @@ async function handleEditButton(interaction) {
       .setMaxLength(1000)
       .setValue(task.description || "");
 
-    modal.addComponents(
+    const rows = [
       new ActionRowBuilder().addComponents(titleInput),
       new ActionRowBuilder().addComponents(descriptionInput),
-    );
+    ];
 
+    try {
+      const projects = await projectService.listByUser(user.id, { status: "active" });
+
+      if (projects.length > 0) {
+        const projectSelect = buildProjectSelectForModal(projects, task.projectId ?? null, {
+          required: true,
+        });
+        rows.push(new ActionRowBuilder().addComponents(projectSelect));
+      }
+    } catch (projectErr) {
+      console.error("[Task Dashboard] Failed to fetch projects for edit modal:", projectErr);
+    }
+
+    modal.addComponents(...rows);
     await interaction.showModal(modal);
   } catch (err) {
     console.error("[Task Dashboard] Edit button error:", err);
@@ -331,8 +351,6 @@ export async function handleTaskButtons(interaction) {
   switch (action) {
     case "new":
       return handleNewTaskButton(interaction);
-    case "refresh":
-      return handleRefreshButton(interaction);
     case "back":
       return handleBackButton(interaction);
     case "status":
