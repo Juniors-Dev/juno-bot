@@ -255,7 +255,7 @@ export default class TaskService {
           include: [this._getProjectInclude()],
         },
       ],
-      order: [["createdAt", "DESC"]],
+      order: [["updatedAt", "DESC"]],
     });
 
     return sessionTask?.task ?? null;
