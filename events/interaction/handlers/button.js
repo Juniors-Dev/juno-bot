@@ -3,8 +3,8 @@ import { handleClockInButton } from "../features/sessions/handle-clock-in-button
 import { handleClockingInButtons } from "../features/sessions/handle-clock-in-interactions.js";
 import { handleClockOutButton } from "../features/sessions/handle-clock-out-button.js";
 import { handleTimerButtons } from "../features/sessions/handle-timer-buttons.js";
-import { projectCreateModal } from "../features/projectHelper/project-create-modal.js";
 import { handleTaskButtons } from "../features/tasks/handlers/index.js";
+import { projectCreateModal } from "../features/projectHelper/project-create-modal.js";
 import { projectEditModal } from "../features/projectHelper/project-edit-modal.js";
 import { projectDeleteConfirmation } from "../features/projectHelper/project-delete.js";
 import { projectDeleteCancelHandler } from "../features/projectHelper/project-cancel-delete-handler.js";
@@ -31,12 +31,14 @@ export const buttonHandlers = {
     run: handleTimerButtons,
     context: { needsUser: true, needsSession: false },
   },
+  tasks: {
+    run: handleTaskButtons,
+    context: { needsUser: true, needsSession: false },
+  },
   project_create: {
     run: projectCreateModal,
     context: { needsUser: true, needsSession: false },
   },
-  tasks: {
-    run: handleTaskButtons,
   project_edit: {
     run: projectEditModal,
     context: { needsUser: true, needsSession: false },

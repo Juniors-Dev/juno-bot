@@ -11,7 +11,7 @@ export const selectHandlers = {
     run: handleClockInSelects,
     context: { needsUser: true, needsSession: false },
   },
-   tasks: {
+  tasks: {
     run: handleTaskSelects,
     context: { needsUser: true, needsSession: false },
   },
