@@ -245,7 +245,6 @@ export default class TaskService {
     });
   }
 
-  //most recently linked task for a session
   async getCurrentTaskForSession(sessionId) {
     const sessionTask = await this.SessionTask.findOne({
       where: { sessionId },
