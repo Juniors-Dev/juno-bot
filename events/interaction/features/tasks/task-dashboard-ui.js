@@ -149,17 +149,7 @@ export function buildTaskDashboard(
 
     components.push(new ActionRowBuilder().addComponents(taskSelect));
   }
-
-  components.push(
-    new ActionRowBuilder().addComponents(
-      new ButtonBuilder()
-        .setCustomId("tasks:refresh")
-        .setLabel("Refresh")
-        .setStyle(ButtonStyle.Secondary)
-        .setEmoji("🔄"),
-    ),
-  );
-
+  
   return {
     components,
     flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
@@ -376,6 +366,7 @@ export function buildV2Message(message, { type = "error" } = {}) {
   };
 }
 
+// --- Helpers ---
 function groupTasksByStatus(tasks) {
   return tasks.reduce((acc, task) => {
     const status = task.status || TASK_STATUS.TODO;
