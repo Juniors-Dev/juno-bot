@@ -1,6 +1,6 @@
 import { MessageFlags } from "discord.js";
 import { displayActiveProjects } from "../../../../../utils/displayProjects.js";
-import { renderLinkManager } from "../../../../../utils/renderLinkManager.js";
+import { renderLinkManager } from "../../../../../features/projects/links/renderLinkManager.js";
 
 export async function handleProjectLinkEditModal(interaction) {
   if (!interaction.isModalSubmit()) return;

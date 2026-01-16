@@ -1,5 +1,5 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags } from "discord.js";
-import { renderLinkManager } from "../../../../../utils/renderLinkManager.js";
+import { renderLinkManager } from "../../../../../features/projects/links/renderLinkManager.js";
 
 export async function projectLinkManager(interaction) {
   await interaction.deferReply({ flags: MessageFlags.Ephemeral });

@@ -1,4 +1,4 @@
-import { renderLinkManager } from "../../../../../utils/renderLinkManager.js";
+import { renderLinkManager } from "../../../../../features/projects/links/renderLinkManager.js";
 
 export async function linkProjectSelectHandler(interaction) {
   try {

@@ -5,7 +5,7 @@ import {
   ButtonStyle,
   MessageFlags,
 } from "discord.js";
-import { renderLinkManager } from "../../utils/renderLinkManager.js";
+import { renderLinkManager } from "../../features/projects/links/renderLinkManager.js";
 
 export default {
   data: new SlashCommandBuilder()
