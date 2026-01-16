@@ -9,13 +9,11 @@ export async function handleProjectLinkEditModal(interaction) {
   const { user } = interaction.botContext;
   if (!user) return;
   await interaction.deferUpdate({ flags: MessageFlags.Ephemeral });
-  console.log(interaction.customId);
   try {
     const { projectService, linkService } = interaction.services;
     const existingProjects = await projectService.listByUser(user.id);
     const selectedProject = existingProjects.find((p) => p.id === projectId);
     const selectedLink = selectedProject?.links.find((l) => l.id == linkId);
-    console.log(selectedProject, selectedLink);
     if (!selectedProject || !selectedLink)
       return interaction.update({
         content: "Project or link can't be found.",
