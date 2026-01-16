@@ -1,7 +1,7 @@
 import { MessageFlags } from "discord.js";
 import { displayActiveProjects } from "../../../../utils/displayProjects.js";
 import { renderProjectManager } from "../../../../utils/renderProjectManager.js";
-
+import { replyEphemeral } from "../../../../utils/reply.js";
 export async function projectDeleteConfirmHandler(interaction) {
   if (!interaction.customId.startsWith("confirm_project_delete:")) return;
   const projectId = interaction.customId.split(":")[1];
@@ -26,9 +26,6 @@ export async function projectDeleteConfirmHandler(interaction) {
     );
   } catch (err) {
     console.error("Delete project error:", err);
-    await interaction.editReply({
-      content: "❌ Something went wrong deleting the project.",
-      components: [],
-    });
+    await replyEphemeral(interaction, "❌ Something went wrong deleting the project.");
   }
 }

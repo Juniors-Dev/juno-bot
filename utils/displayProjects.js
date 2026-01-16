@@ -40,13 +40,10 @@ export async function displayActiveProjects(
           ?.map((pm) => pm.user?.name || "Unknown")
           .slice(0, 5) // optional limit
           .join(", ") || "No members";
-      const links = project.links
-        ? project.links?.map((l) => `${l.kind}: ${l.url}`).join("\n") || "No links"
-        : "No links";
 
       embed.addFields({
         name: project.name,
-        value: `Status: **${project.status}**\nMembers: ${members}\n**Links**\n${links}\n**description**\n${desc}`,
+        value: `Status: **${project.status}**\nMembers: ${members}\n${desc}`,
         inline: false,
       });
     }

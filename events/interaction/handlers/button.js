@@ -1,5 +1,6 @@
 import { handleCreateUserButton } from "../features/users/create-user-modal.js";
 import { handleClockInButton } from "../features/sessions/handle-clock-in-button.js";
+import { handleClockingInButtons } from "../features/sessions/handle-clock-in-interactions.js";
 import { handleClockOutButton } from "../features/sessions/handle-clock-out-button.js";
 import { handleTimerButtons } from "../features/sessions/handle-timer-buttons.js";
 import { projectCreateModal } from "../features/projectHelper/project-create-modal.js";
@@ -22,6 +23,10 @@ export const buttonHandlers = {
   },
   clock_out_button: {
     run: handleClockOutButton,
+    context: { needsUser: true, needsSession: false },
+  },
+  clock_in: {
+    run: handleClockingInButtons,
     context: { needsUser: true, needsSession: false },
   },
   timer: {

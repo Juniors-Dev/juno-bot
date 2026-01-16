@@ -17,7 +17,10 @@ export async function handleProjectEditModal(interaction) {
   try {
     const { user } = interaction.botContext;
     const existingProjects = await projectService.listByUser(user.id);
-    if (existingProjects.some((p) => p.name.toLowerCase() === name.toLowerCase())) {
+    const isDuplicate = existingProjects.some(
+      (p) => p.name.toLowerCase() === name.toLowerCase() && String(p.id) !== String(projectId),
+    );
+    if (isDuplicate) {
       await interaction.followUp({
         content:
           "❌ You already have another project with that name. Please choose a different one.",
