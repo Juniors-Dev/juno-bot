@@ -42,6 +42,7 @@ export async function handleProjectLinkEditModal(interaction) {
 
     if (
       selectedProject.links &&
+      selectedLink.kind !== kind &&
       selectedProject.links.some(
         (l) => l.id !== linkId && l.kind.toLowerCase() === kind.toLowerCase(),
       )
