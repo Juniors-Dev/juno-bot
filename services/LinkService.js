@@ -86,7 +86,6 @@ export default class LinkService {
     const link = await this.Link.findOne({ where: { id: linkId, projectId } });
     if (!link) throw new Error("Link not found in this project.");
 
-    await this.Link.destroy({ where: { id: linkId, projectId } });
-    return this.getById(projectId);
+    return await this.Link.destroy({ where: { id: linkId, projectId } });
   }
 }

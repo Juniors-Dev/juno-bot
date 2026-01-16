@@ -12,7 +12,9 @@ import { projectArchiveHandler } from "../features/projectHelper/project-archive
 import { projectRestoreHandler } from "../features/projectHelper/project-restore-handler.js";
 import { projectEditModal } from "../features/projectHelper/project-edit-modal.js";
 import { projectEditLinkModal } from "../features/projectHelper/links/project-link-edit-modal.js";
-
+import { projectLinkDeleteConfirmation } from "../features/projectHelper/links/project-links-delete.js";
+import { projectLinkDeleteCancelHandler } from "../features/projectHelper/links/project-link-cancel-delete-handler.js";
+import { projectLinkDeleteConfirmHandler } from "../features/projectHelper/links/project-link-confirm-delete-handler.js";
 export const buttonHandlers = {
   create_user_modal_button: {
     run: handleCreateUserButton,
@@ -44,6 +46,18 @@ export const buttonHandlers = {
   },
   project_link_edit: {
     run: projectEditLinkModal,
+    context: { needsUser: true, needsSession: false },
+  },
+  project_link_delete: {
+    run: projectLinkDeleteConfirmation,
+    context: { needsUser: true, needsSession: false },
+  },
+  cancel_project_link_delete: {
+    run: projectLinkDeleteCancelHandler,
+    context: { needsUser: true, needsSession: false },
+  },
+  confirm_project_link_delete: {
+    run: projectLinkDeleteConfirmHandler,
     context: { needsUser: true, needsSession: false },
   },
   project_delete: {
