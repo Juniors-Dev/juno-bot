@@ -53,7 +53,7 @@ export class TtlCache {
       expiresAt: this._now() + this.ttlMs,
     });
 
-    this._pruneIfNeeded();
+    this._trimIfNeeded();
   }
 
   del(key) {
