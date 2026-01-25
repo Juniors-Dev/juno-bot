@@ -149,7 +149,7 @@ export function buildTaskDashboard(
 
     components.push(new ActionRowBuilder().addComponents(taskSelect));
   }
-  
+
   return {
     components,
     flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
