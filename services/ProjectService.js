@@ -1,3 +1,5 @@
+import { TtlCache } from "../utils/TtlCache.js";
+
 export default class ProjectService {
   constructor(db) {
     this.client = db.sequelize;
@@ -5,6 +7,14 @@ export default class ProjectService {
     this.User = db.User;
     this.ProjectMember = db.ProjectMember;
     this.Link = db.Link;
+    this.cache = new TtlCache({
+      ttlMs: 15 * 60 * 1000,
+      cloneOnGet: true,
+    });
+  }
+
+  _toPlain(model) {
+    return model ? model.get({ plain: true }) : null;
   }
 
   // CREATE PROJECT
@@ -33,14 +43,26 @@ export default class ProjectService {
     });
   }
 
-  // READ
-  async getById(id, options = {}) {
+  _getByIdDb(id, options = {}) {
     return this.Project.findByPk(id, {
       include: [
         { model: this.ProjectMember, as: "projectMembers" },
         { model: this.Link, as: "links" },
       ],
       ...options,
+    });
+  }
+
+  async getById(id, options = {}) {
+    // If transaction present, bypass cache
+    if (options.transaction) {
+      const project = await this._getByIdDb(id, options);
+      return this._toPlain(project);
+    }
+
+    return this.cache.getOrSet(`project:${id}`, async () => {
+      const project = await this._getByIdDb(id, options);
+      return this._toPlain(project);
     });
   }
 
@@ -100,17 +122,15 @@ export default class ProjectService {
       }
     }
     await this.Project.update(updateData, { where: { id } });
-    return this.Project.findByPk(id, {
-      include: [
-        { model: this.ProjectMember, as: "projectMembers" },
-        { model: this.Link, as: "links" },
-      ],
-    });
+    this.cache.del(`project:${id}`);
+    return this.getById(id);
   }
 
   // HARD DELETE
   async delete({ id, userId }) {
-    return this.client.transaction(async (t) => {
+    let memberUserIds = [];
+
+    await this.client.transaction(async (t) => {
       const project = await this.Project.findOne({
         where: { id },
         include: [{ model: this.ProjectMember, as: "projectMembers" }],
@@ -122,12 +142,19 @@ export default class ProjectService {
       const member = project.projectMembers.find((m) => m.userId === userId);
       if (!member?.isAdmin) throw new Error("You don't have permission to delete this project.");
 
+      memberUserIds = project.projectMembers.map((m) => m.userId);
+
       await this.ProjectMember.destroy({ where: { projectId: id }, transaction: t });
       await this.Link.destroy({ where: { projectId: id }, transaction: t });
       await project.destroy({ transaction: t });
-
-      return true;
     });
+
+    this.cache.del(`project:${id}`);
+    for (const userId of memberUserIds) {
+      this.cache.del(`project:list:user:${userId}`);
+    }
+
+    return true;
   }
 
   // DELETE (soft delete / archive)
