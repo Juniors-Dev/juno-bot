@@ -14,6 +14,7 @@ import {
   buildProjectSelectForModal,
   STATUS_CONFIG,
 } from "../task-dashboard-ui.js";
+import { getTaskDetailContext } from "../task-dashboard-helpers.js";
 import { buildClockInMessagePayload } from "../../../../../features/session/messageBuilder.js";
 import { startTimer } from "../../../../../features/session/timerManager.js";
 import { DEFAULT_SESSION_MINUTES } from "../../../../../features/session/constants.js";
@@ -170,6 +171,73 @@ async function handleStartWorking(interaction) {
   } catch (err) {
     console.error("[Task Dashboard] Start working error:", err);
     await interaction.editReply(buildV2Message("Something went wrong starting your session."));
+  }
+}
+
+async function handleSwitchToTask(interaction) {
+  const { user } = interaction.botContext;
+  const { taskService, sessionService } = interaction.services;
+
+  const taskId = parseInt(interaction.customId.split(":")[2], 10);
+
+  await interaction.deferUpdate();
+
+  try {
+    const task = await taskService.getById(taskId, user.id, { includeProject: true });
+    if (!task) {
+      return interaction.editReply(buildV2Message("Task not found.", { type: "warning" }));
+    }
+
+    const activeSession = await sessionService.getOneActive(user.id);
+    if (!activeSession) {
+      const payload = buildTaskDetail(task, {
+        hasActiveSession: false,
+        currentTaskId: null,
+        notification: "You're not clocked in.",
+      });
+      return interaction.editReply(payload);
+    }
+
+    const currentSessionTask = await taskService.getCurrentTaskForSession(activeSession.id);
+    const currentTaskId = currentSessionTask?.id ?? null;
+
+    if (currentTaskId != null && String(currentTaskId) === String(task.id)) {
+      const payload = buildTaskDetail(task, {
+        hasActiveSession: true,
+        currentTaskId,
+        notification: "You're already working on this task.",
+      });
+      return interaction.editReply(payload);
+    }
+
+    const sessionTask = await taskService.linkToActiveSession(user.id, task.id);
+    if (!sessionTask) {
+      const payload = buildTaskDetail(task, {
+        hasActiveSession: true,
+        currentTaskId,
+        notification: "Couldn't switch to that task.",
+      });
+      return interaction.editReply(payload);
+    }
+
+    const activity = task.project?.name ? `[${task.project.name}] ${task.title}` : task.title;
+    await sessionService.updateActivity(user.id, activity);
+
+    if (task.status === TASK_STATUS.TODO) {
+      await taskService.updateStatus(task.id, user.id, TASK_STATUS.IN_PROGRESS);
+      task.status = TASK_STATUS.IN_PROGRESS;
+    }
+
+    const payload = buildTaskDetail(task, {
+      hasActiveSession: true,
+      currentTaskId: task.id,
+      notification: "✅ Now working on this task!",
+    });
+
+    await interaction.editReply(payload);
+  } catch (err) {
+    console.error("[Task Dashboard] Switch task error:", err);
+    await interaction.editReply(buildV2Message("Something went wrong switching tasks."));
   }
 }
 
@@ -333,8 +401,8 @@ async function handleBackToDetail(interaction) {
       return interaction.editReply(buildV2Message("⚠️ Task not found.", { type: "warning" }));
     }
 
-    const session = await sessionService.getOneActive(user.id);
-    const payload = buildTaskDetail(task, { hasActiveSession: !!session });
+    const context = await getTaskDetailContext(taskService, sessionService, user.id);
+    const payload = buildTaskDetail(task, context);
 
     await interaction.editReply(payload);
   } catch (err) {
@@ -343,7 +411,6 @@ async function handleBackToDetail(interaction) {
   }
 }
 
-//--- Router ----
 export async function handleTaskButtons(interaction) {
   const parts = interaction.customId.split(":");
   const action = parts[1];
@@ -357,6 +424,8 @@ export async function handleTaskButtons(interaction) {
       return handleStatusChange(interaction);
     case "start_working":
       return handleStartWorking(interaction);
+    case "switch_to":
+      return handleSwitchToTask(interaction);
     case "edit":
       return handleEditButton(interaction);
     case "archive":
