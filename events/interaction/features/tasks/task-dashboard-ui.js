@@ -12,6 +12,7 @@ import {
 } from "discord.js";
 import { TASK_STATUS } from "../../../../services/TaskService.js";
 
+// ------ CONFIGURATION ------
 export const STATUS_CONFIG = {
   [TASK_STATUS.IN_PROGRESS]: { emoji: "🔵", label: "In Progress", color: 0x3498db },
   [TASK_STATUS.TODO]: { emoji: "🟡", label: "Todo", color: 0xf1c40f },
@@ -30,6 +31,7 @@ const FILTER_OPTIONS = [
 const DISCORD_SELECT_LIMIT = 25;
 const TASK_PREVIEW_LIMIT = 20;
 
+// ------ MAIN DASHBOARD BUILDERS ------
 /**
  * Build the task dashboard UI (Components v2)
  * @param {Array} tasks - User's tasks
@@ -330,6 +332,7 @@ export function buildTaskDetail(
   };
 }
 
+// ------ CONFIRMATION & UTILITY BUILDERS ------
 export function buildDeleteConfirmation(task) {
   const components = [];
 
@@ -383,7 +386,7 @@ export function buildV2Message(message, { type = "error" } = {}) {
   };
 }
 
-//Helpers
+//------ HELPERS ------
 function groupTasksByStatus(tasks) {
   return tasks.reduce((acc, task) => {
     const status = task.status || TASK_STATUS.TODO;
