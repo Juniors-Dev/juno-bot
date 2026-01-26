@@ -1,5 +1,6 @@
 import { setState, refreshDashboard } from "../task-dashboard-state.js";
 import { buildTaskDashboard, buildTaskDetail, buildV2Message } from "../task-dashboard-ui.js";
+import { getTaskDetailContext } from "../task-dashboard-helpers.js";
 
 async function handleFilterSelect(interaction) {
   const newFilter = interaction.values[0];
@@ -37,11 +38,8 @@ async function handleTaskSelect(interaction) {
       );
     }
 
-    const session = await sessionService.getOneActive(user.id);
-
-    const payload = buildTaskDetail(task, {
-      hasActiveSession: !!session,
-    });
+    const context = await getTaskDetailContext(taskService, sessionService, user.id);
+    const payload = buildTaskDetail(task, context);
 
     await interaction.editReply(payload);
   } catch (err) {
