@@ -2,7 +2,7 @@ import { handleCreateUserModal } from "../features/users/handle-user-modal.js";
 import { handleProjectCreateModal } from "../features/projectHelper/project-create-modal-handler.js";
 import { handleProjectEditModal } from "../features/projectHelper/project-edit-modal-handler.js";
 import { handleClockInModals } from "../features/sessions/handle-clock-in-interactions.js";
-import { handleTaskModals } from "../features/tasks/handlers/index.js";
+import { handleTaskModals } from "../features/tasks/handlers/modals/index.js";
 
 export const modalSubmitHandlers = {
   create_user_modal: {

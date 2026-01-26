@@ -1,8 +1,8 @@
-import { setState, refreshDashboard } from "../task-dashboard-state.js";
-import { buildTaskDashboard, buildTaskDetail, buildV2Message } from "../task-dashboard-ui.js";
-import { getTaskDetailContext } from "../task-dashboard-helpers.js";
+import { setState, refreshDashboard } from "../../task-dashboard-state.js";
+import { buildTaskDashboard, buildTaskDetail, buildV2Message } from "../../task-dashboard-ui.js";
+import { getTaskDetailContext } from "../../task-dashboard-helpers.js";
 
-async function handleFilterSelect(interaction) {
+async function handleFilter(interaction) {
   const newFilter = interaction.values[0];
   setState(interaction.user.id, { filter: newFilter, selectedTaskId: null });
 
@@ -20,7 +20,7 @@ async function handleFilterSelect(interaction) {
   }
 }
 
-async function handleTaskSelect(interaction) {
+async function handleTask(interaction) {
   const { user } = interaction.botContext;
   const { taskService, sessionService } = interaction.services;
 
@@ -48,16 +48,7 @@ async function handleTaskSelect(interaction) {
   }
 }
 
-//--- Router ----
-export async function handleTaskSelects(interaction) {
-  const [, action] = interaction.customId.split(":");
-
-  switch (action) {
-    case "filter":
-      return handleFilterSelect(interaction);
-    case "select":
-      return handleTaskSelect(interaction);
-    default:
-      console.warn(`[Task Dashboard] Unknown select action: ${action}`);
-  }
-}
+export const selectHandlers = {
+  filter: handleFilter,
+  select: handleTask,
+};

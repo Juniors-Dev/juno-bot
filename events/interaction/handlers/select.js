@@ -1,6 +1,6 @@
 import { projectSelectHandler } from "../features/projectHelper/project-select-menu-handler.js";
 import { handleClockInSelects } from "../features/sessions/handle-clock-in-interactions.js";
-import { handleTaskSelects } from "../features/tasks/handlers/index.js";
+import { handleTaskSelects } from "../features/tasks/handlers/selects/index.js";
 
 export const selectHandlers = {
   project_select: {
