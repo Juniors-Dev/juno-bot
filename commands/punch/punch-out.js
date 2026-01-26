@@ -13,7 +13,7 @@ export default {
     await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
     try {
-      const { sessionService } = interaction.services;
+      const { sessionService, taskService } = interaction.services;
       const { user, session } = interaction.botContext;
 
       if (session) {
@@ -21,8 +21,9 @@ export default {
       }
 
       const result = await sessionService.end(user.id);
+      const tasksWorkedOn = await taskService.getTasksForSession(result.session.id);
 
-      const payload = buildClockOutMessagePayload(result);
+      const payload = buildClockOutMessagePayload(result, { tasksWorkedOn });
       await interaction.editReply(payload);
       // TODO: Update dashboard
     } catch (err) {
