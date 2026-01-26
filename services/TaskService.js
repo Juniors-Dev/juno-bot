@@ -229,17 +229,15 @@ export default class TaskService {
 
       if (!session) return null;
 
-      const [sessionTask] = await this.SessionTask.findOrCreate({
-        where: {
-          sessionId: session.id,
-          taskId,
-        },
-        defaults: {
-          sessionId: session.id,
-          taskId,
-        },
+      const [sessionTask, wasCreated] = await this.SessionTask.findOrCreate({
+        where: { sessionId: session.id, taskId },
+        defaults: { sessionId: session.id, taskId },
         transaction: t,
       });
+
+      if (!wasCreated) {
+        await sessionTask.update({ updatedAt: new Date() }, { transaction: t });
+      }
 
       return sessionTask;
     });
