@@ -161,9 +161,13 @@ export function buildTaskDashboard(
  * @param {Object} task - The task to display
  * @param {Object} options
  * @param {boolean} options.hasActiveSession - Whether user is clocked in
+ * @param {number|null} options.currentTaskId - ID of the task linked to current session
  * @param {string|null} options.notification - Optional notification message
  */
-export function buildTaskDetail(task, { hasActiveSession = false, notification = null } = {}) {
+export function buildTaskDetail(
+  task,
+  { hasActiveSession = false, currentTaskId = null, notification = null } = {},
+) {
   const config = STATUS_CONFIG[task.status] || STATUS_CONFIG[TASK_STATUS.TODO];
   const components = [];
 
@@ -173,25 +177,38 @@ export function buildTaskDetail(task, { hasActiveSession = false, notification =
 
   const container = new ContainerBuilder().setAccentColor(config.color || 0x5865f2);
 
-  const canStartWorking =
-    !hasActiveSession && task.status !== TASK_STATUS.DONE && task.status !== TASK_STATUS.ARCHIVED;
+  const isActionable = task.status !== TASK_STATUS.DONE && task.status !== TASK_STATUS.ARCHIVED;
+  const isCurrentTask = currentTaskId != null && String(currentTaskId) === String(task.id);
 
-  if (canStartWorking) {
+  let headerButton = null;
+
+  if (isActionable) {
+    if (!hasActiveSession) {
+      headerButton = (button) =>
+        button
+          .setCustomId(`tasks:start_working:${task.id}`)
+          .setLabel("Start Working")
+          .setStyle(ButtonStyle.Success);
+    } else if (!isCurrentTask) {
+      headerButton = (button) =>
+        button
+          .setCustomId(`tasks:switch_to:${task.id}`)
+          .setLabel("Work on this")
+          .setStyle(ButtonStyle.Primary);
+    }
+  }
+
+  if (!headerButton) {
+    container.addTextDisplayComponents((textDisplay) =>
+      textDisplay.setContent(`## ${config.emoji} ${task.title}`),
+    );
+  } else {
     container.addSectionComponents((section) =>
       section
         .addTextDisplayComponents((textDisplay) =>
           textDisplay.setContent(`## ${config.emoji} ${task.title}`),
         )
-        .setButtonAccessory((button) =>
-          button
-            .setCustomId(`tasks:start_working:${task.id}`)
-            .setLabel("Start Working")
-            .setStyle(ButtonStyle.Success),
-        ),
-    );
-  } else {
-    container.addTextDisplayComponents((textDisplay) =>
-      textDisplay.setContent(`## ${config.emoji} ${task.title}`),
+        .setButtonAccessory(headerButton),
     );
   }
 
