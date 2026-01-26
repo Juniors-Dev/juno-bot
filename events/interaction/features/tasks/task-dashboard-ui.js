@@ -383,45 +383,7 @@ export function buildV2Message(message, { type = "error" } = {}) {
   };
 }
 
-/**
- * Build project select menu for modals
- * @param {Array<{ id: string, name: string }>} projects
- * @param {string|null} currentProjectId
- * @returns {StringSelectMenuBuilder}
- */
-export function buildProjectSelectForModal(
-  projects,
-  currentProjectId = null,
-  { required = false } = {},
-) {
-  const options = [];
-
-  options.push(
-    new StringSelectMenuOptionBuilder()
-      .setLabel("No project")
-      .setValue("no_project")
-      .setDefault(currentProjectId == null),
-  );
-
-  for (const project of projects.slice(0, 24)) {
-    const isSelected = currentProjectId != null && String(project.id) === String(currentProjectId);
-
-    options.push(
-      new StringSelectMenuOptionBuilder()
-        .setLabel(truncate(project.name, 100))
-        .setValue(String(project.id))
-        .setDefault(isSelected),
-    );
-  }
-
-  return new StringSelectMenuBuilder()
-    .setCustomId("project_select")
-    .setPlaceholder("Select a project...")
-    .setRequired(required)
-    .addOptions(options);
-}
-
-// --- Helpers ---
+//Helpers
 function groupTasksByStatus(tasks) {
   return tasks.reduce((acc, task) => {
     const status = task.status || TASK_STATUS.TODO;

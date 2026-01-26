@@ -1,29 +1,21 @@
-import {
-  ModalBuilder,
-  TextInputBuilder,
-  TextInputStyle,
-  ActionRowBuilder,
-  MessageFlags,
-} from "discord.js";
-import { setState, clearState, refreshDashboard } from "../task-dashboard-state.js";
+import { ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder } from "discord.js";
+import { setState, refreshDashboard } from "../task-dashboard-state.js";
 import {
   buildTaskDashboard,
   buildTaskDetail,
   buildDeleteConfirmation,
   buildV2Message,
-  buildProjectSelectForModal,
   STATUS_CONFIG,
 } from "../task-dashboard-ui.js";
 import { getTaskDetailContext } from "../task-dashboard-helpers.js";
-import { buildClockInMessagePayload } from "../../../../../features/session/messageBuilder.js";
-import { startTimer } from "../../../../../features/session/timerManager.js";
-import { DEFAULT_SESSION_MINUTES } from "../../../../../features/session/constants.js";
+import {
+  DEFAULT_SESSION_MINUTES,
+  MIN_SESSION_MINUTES,
+  MAX_SESSION_MINUTES,
+} from "../../../../../features/session/constants.js";
 import { TASK_STATUS } from "../../../../../services/TaskService.js";
 
 async function handleNewTaskButton(interaction) {
-  const { user } = interaction.botContext;
-  const { projectService } = interaction.services;
-
   const modal = new ModalBuilder().setCustomId("tasks:new_modal").setTitle("Create New Task");
 
   const titleInput = new TextInputBuilder()
@@ -42,25 +34,11 @@ async function handleNewTaskButton(interaction) {
     .setMaxLength(1000)
     .setPlaceholder("Add any notes or details...");
 
-  const titleRow = new ActionRowBuilder().addComponents(titleInput);
-  const descriptionRow = new ActionRowBuilder().addComponents(descriptionInput);
-
-  try {
-    const projects = await projectService.listByUser(user.id, { status: "active" });
-    const rows = [titleRow, descriptionRow];
-
-    if (projects.length > 0) {
-      const projectSelect = buildProjectSelectForModal(projects);
-      rows.push(new ActionRowBuilder().addComponents(projectSelect));
-    }
-
-    modal.addComponents(...rows);
-    await interaction.showModal(modal);
-  } catch (err) {
-    console.error("[Task Dashboard] New Task Modal Error:", err);
-    modal.addComponents(titleRow, descriptionRow);
-    await interaction.showModal(modal);
-  }
+  modal.addComponents(
+    new ActionRowBuilder().addComponents(titleInput),
+    new ActionRowBuilder().addComponents(descriptionInput),
+  );
+  await interaction.showModal(modal);
 }
 
 async function handleBackButton(interaction) {
@@ -119,59 +97,22 @@ async function handleStatusChange(interaction) {
 }
 
 async function handleStartWorking(interaction) {
-  const { user } = interaction.botContext;
-  const { taskService, sessionService } = interaction.services;
-
   const taskId = parseInt(interaction.customId.split(":")[2], 10);
 
-  await interaction.deferUpdate();
+  const modal = new ModalBuilder()
+    .setCustomId(`tasks:start_working_modal:${taskId}`)
+    .setTitle("Start Working");
 
-  try {
-    const task = await taskService.getById(taskId, user.id, { includeProject: true });
+  const durationInput = new TextInputBuilder()
+    .setCustomId("duration")
+    .setLabel(`Session duration (${MIN_SESSION_MINUTES}-${MAX_SESSION_MINUTES} min)`)
+    .setStyle(TextInputStyle.Short)
+    .setRequired(false)
+    .setPlaceholder(`defaults to ${DEFAULT_SESSION_MINUTES} minutes`);
 
-    if (!task) {
-      return interaction.editReply(buildV2Message("Task not found.", { type: "warning" }));
-    }
+  modal.addComponents(new ActionRowBuilder().addComponents(durationInput));
 
-    const activity = task.project?.name ? `[${task.project.name}] ${task.title}` : task.title;
-
-    const session = await sessionService.start(user.id, {
-      activity,
-      targetDurationMinutes: DEFAULT_SESSION_MINUTES,
-    });
-
-    if (!session) {
-      return interaction.editReply(
-        buildV2Message("You're already clocked in.", { type: "warning" }),
-      );
-    }
-
-    await taskService.linkToActiveSession(user.id, task.id);
-
-    if (task.status === TASK_STATUS.TODO) {
-      await taskService.updateStatus(task.id, user.id, TASK_STATUS.IN_PROGRESS);
-    }
-
-    startTimer(interaction.client, session, DEFAULT_SESSION_MINUTES);
-    clearState(interaction.user.id);
-
-    await interaction.editReply(
-      buildV2Message("✅ Session started from this task. You'll get a warning DM before it ends.", {
-        type: "info",
-      }),
-    );
-
-    const clockInPayload = buildClockInMessagePayload({
-      session,
-      targetDurationMinutes: DEFAULT_SESSION_MINUTES,
-      activity,
-    });
-
-    await interaction.followUp({ ...clockInPayload, flags: MessageFlags.Ephemeral });
-  } catch (err) {
-    console.error("[Task Dashboard] Start working error:", err);
-    await interaction.editReply(buildV2Message("Something went wrong starting your session."));
-  }
+  await interaction.showModal(modal);
 }
 
 async function handleSwitchToTask(interaction) {
@@ -243,7 +184,7 @@ async function handleSwitchToTask(interaction) {
 
 async function handleEditButton(interaction) {
   const { user } = interaction.botContext;
-  const { taskService, projectService } = interaction.services;
+  const { taskService } = interaction.services;
 
   const taskId = parseInt(interaction.customId.split(":")[2], 10);
 
@@ -277,25 +218,11 @@ async function handleEditButton(interaction) {
       .setMaxLength(1000)
       .setValue(task.description || "");
 
-    const rows = [
+    modal.addComponents(
       new ActionRowBuilder().addComponents(titleInput),
       new ActionRowBuilder().addComponents(descriptionInput),
-    ];
+    );
 
-    try {
-      const projects = await projectService.listByUser(user.id, { status: "active" });
-
-      if (projects.length > 0) {
-        const projectSelect = buildProjectSelectForModal(projects, task.projectId ?? null, {
-          required: true,
-        });
-        rows.push(new ActionRowBuilder().addComponents(projectSelect));
-      }
-    } catch (projectErr) {
-      console.error("[Task Dashboard] Failed to fetch projects for edit modal:", projectErr);
-    }
-
-    modal.addComponents(...rows);
     await interaction.showModal(modal);
   } catch (err) {
     console.error("[Task Dashboard] Edit button error:", err);
