@@ -1,5 +1,6 @@
 import { refreshDashboard } from "../task-dashboard-state.js";
 import { buildTaskDashboard, buildTaskDetail, buildV2Message } from "../task-dashboard-ui.js";
+import { getTaskDetailContext } from "../task-dashboard-helpers.js";
 import { TASK_STATUS } from "../../../../../services/TaskService.js";
 
 async function handleNewTaskModal(interaction) {
@@ -60,10 +61,10 @@ async function handleEditModal(interaction) {
     }
 
     const task = await taskService.getById(taskId, user.id, { includeProject: true });
-    const session = await sessionService.getOneActive(user.id);
+    const context = await getTaskDetailContext(taskService, sessionService, user.id);
 
     const payload = buildTaskDetail(task, {
-      hasActiveSession: !!session,
+      ...context,
       notification: "✅ Task updated!",
     });
 
