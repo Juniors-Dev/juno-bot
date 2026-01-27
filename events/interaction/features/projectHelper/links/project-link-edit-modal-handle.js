@@ -8,7 +8,7 @@ export async function handleProjectLinkEditModal(interaction) {
   if (customId !== "edit_project_link_modal") return;
   const { user } = interaction.botContext;
   if (!user) return;
-  await interaction.deferUpdate({ flags: MessageFlags.Ephemeral });
+  await interaction.deferUpdate();
   try {
     const { projectService, linkService } = interaction.services;
     const existingProjects = await projectService.listByUser(user.id);
