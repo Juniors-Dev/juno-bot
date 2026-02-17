@@ -1,4 +1,4 @@
-import { ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder } from "discord.js";
+import { ModalBuilder, TextInputBuilder, TextInputStyle, LabelBuilder } from "discord.js";
 import { buildClockInMessagePayload } from "../../../../features/session/messageBuilder.js";
 import { startTimer } from "../../../../features/session/timerManager.js";
 import { getClockInState, setClockInState, clearClockInState } from "./clock-in-state.js";
@@ -14,12 +14,15 @@ function showDurationModal(interaction) {
 
   const durationInput = new TextInputBuilder()
     .setCustomId("duration")
-    .setLabel(`How long will you work? (${MIN_SESSION_MINUTES}-${MAX_SESSION_MINUTES} min)`)
     .setStyle(TextInputStyle.Short)
     .setRequired(false)
     .setPlaceholder(`defaults to ${DEFAULT_SESSION_MINUTES} minutes`);
 
-  modal.addComponents(new ActionRowBuilder().addComponents(durationInput));
+  const durationLabel = new LabelBuilder()
+    .setLabel(`How long will you work? (${MIN_SESSION_MINUTES}-${MAX_SESSION_MINUTES} min)`)
+    .setTextInputComponent(durationInput);
+
+  modal.addLabelComponents(durationLabel);
 
   return interaction.showModal(modal);
 }
@@ -46,7 +49,6 @@ export async function handleNewTaskButton(interaction) {
 
   const titleInput = new TextInputBuilder()
     .setCustomId("title")
-    .setLabel("Task title")
     .setStyle(TextInputStyle.Short)
     .setRequired(true)
     .setMaxLength(200)
@@ -54,7 +56,6 @@ export async function handleNewTaskButton(interaction) {
 
   const descriptionInput = new TextInputBuilder()
     .setCustomId("description")
-    .setLabel("Description (optional)")
     .setStyle(TextInputStyle.Paragraph)
     .setRequired(false)
     .setMaxLength(1000)
@@ -62,15 +63,16 @@ export async function handleNewTaskButton(interaction) {
 
   const durationInput = new TextInputBuilder()
     .setCustomId("duration")
-    .setLabel(`Session duration (${MIN_SESSION_MINUTES}-${MAX_SESSION_MINUTES} min)`)
     .setStyle(TextInputStyle.Short)
     .setRequired(false)
     .setPlaceholder(`defaults to ${DEFAULT_SESSION_MINUTES} minutes`);
 
-  modal.addComponents(
-    new ActionRowBuilder().addComponents(titleInput),
-    new ActionRowBuilder().addComponents(descriptionInput),
-    new ActionRowBuilder().addComponents(durationInput),
+  modal.addLabelComponents(
+    new LabelBuilder().setLabel("Task title").setTextInputComponent(titleInput),
+    new LabelBuilder().setLabel("Description (optional)").setTextInputComponent(descriptionInput),
+    new LabelBuilder()
+      .setLabel(`Session duration (${MIN_SESSION_MINUTES}-${MAX_SESSION_MINUTES} min)`)
+      .setTextInputComponent(durationInput),
   );
 
   await interaction.showModal(modal);
