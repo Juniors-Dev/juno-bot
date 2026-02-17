@@ -1,4 +1,4 @@
-import { ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder } from "discord.js";
+import { ModalBuilder, TextInputBuilder, TextInputStyle, LabelBuilder } from "discord.js";
 import { buildTaskDetail, buildV2Message, STATUS_CONFIG } from "../../task-dashboard-ui.js";
 import {
   DEFAULT_SESSION_MINUTES,
@@ -56,12 +56,15 @@ async function handleStartWorking(interaction) {
 
   const durationInput = new TextInputBuilder()
     .setCustomId("duration")
-    .setLabel(`Session duration (${MIN_SESSION_MINUTES}-${MAX_SESSION_MINUTES} min)`)
     .setStyle(TextInputStyle.Short)
     .setRequired(false)
     .setPlaceholder(`defaults to ${DEFAULT_SESSION_MINUTES} minutes`);
 
-  modal.addComponents(new ActionRowBuilder().addComponents(durationInput));
+  const durationLabel = new LabelBuilder()
+    .setLabel(`Session duration (${MIN_SESSION_MINUTES}-${MAX_SESSION_MINUTES} min)`)
+    .setTextInputComponent(durationInput);
+
+  modal.addLabelComponents(durationLabel);
 
   await interaction.showModal(modal);
 }

@@ -1,17 +1,20 @@
-import { ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder } from "discord.js";
+import { ModalBuilder, TextInputBuilder, TextInputStyle, LabelBuilder } from "discord.js";
 import { refreshDashboard } from "../../task-dashboard-state.js";
 import {
   buildTaskDashboard,
   buildDeleteConfirmation,
   buildV2Message,
+  buildProjectSelectForModal,
 } from "../../task-dashboard-ui.js";
 
 async function handleNew(interaction) {
+  const { user } = interaction.botContext;
+  const { projectService } = interaction.services;
+
   const modal = new ModalBuilder().setCustomId("tasks:new_modal").setTitle("Create New Task");
 
   const titleInput = new TextInputBuilder()
     .setCustomId("title")
-    .setLabel("Task title")
     .setStyle(TextInputStyle.Short)
     .setRequired(true)
     .setMaxLength(200)
@@ -19,22 +22,45 @@ async function handleNew(interaction) {
 
   const descriptionInput = new TextInputBuilder()
     .setCustomId("description")
-    .setLabel("Description (optional)")
     .setStyle(TextInputStyle.Paragraph)
     .setRequired(false)
     .setMaxLength(1000)
     .setPlaceholder("Add any notes or details...");
 
-  modal.addComponents(
-    new ActionRowBuilder().addComponents(titleInput),
-    new ActionRowBuilder().addComponents(descriptionInput),
-  );
-  await interaction.showModal(modal);
+  const titleLabel = new LabelBuilder().setLabel("Task title").setTextInputComponent(titleInput);
+
+  const descriptionLabel = new LabelBuilder()
+    .setLabel("Description (optional)")
+    .setTextInputComponent(descriptionInput);
+
+  try {
+    const projects = await projectService.listByUser(user.id, { status: "active" });
+
+    const labels = [titleLabel, descriptionLabel];
+
+    if (projects.length > 0) {
+      const projectSelect = buildProjectSelectForModal(projects);
+
+      const projectLabel = new LabelBuilder()
+        .setLabel("Project (optional)")
+        .setDescription("Link this task to a project")
+        .setStringSelectMenuComponent(projectSelect);
+
+      labels.push(projectLabel);
+    }
+
+    modal.addLabelComponents(...labels);
+    await interaction.showModal(modal);
+  } catch (err) {
+    console.error("[Task Dashboard] New Task Modal Error:", err);
+    modal.addLabelComponents(titleLabel, descriptionLabel);
+    await interaction.showModal(modal);
+  }
 }
 
 async function handleEdit(interaction) {
   const { user } = interaction.botContext;
-  const { taskService } = interaction.services;
+  const { taskService, projectService } = interaction.services;
 
   const taskId = parseInt(interaction.customId.split(":")[2], 10);
 
@@ -42,9 +68,7 @@ async function handleEdit(interaction) {
     const task = await taskService.getById(taskId, user.id, { includeProject: true });
 
     if (!task) {
-      await interaction.reply({
-        ...buildV2Message("⚠️ Task not found.", { type: "warning" }),
-      });
+      await interaction.reply(buildV2Message("⚠️ Task not found.", { type: "warning" }));
       return;
     }
 
@@ -54,7 +78,6 @@ async function handleEdit(interaction) {
 
     const titleInput = new TextInputBuilder()
       .setCustomId("title")
-      .setLabel("Task title")
       .setStyle(TextInputStyle.Short)
       .setRequired(true)
       .setMaxLength(200)
@@ -62,23 +85,43 @@ async function handleEdit(interaction) {
 
     const descriptionInput = new TextInputBuilder()
       .setCustomId("description")
-      .setLabel("Description (optional)")
       .setStyle(TextInputStyle.Paragraph)
       .setRequired(false)
       .setMaxLength(1000)
       .setValue(task.description || "");
 
-    modal.addComponents(
-      new ActionRowBuilder().addComponents(titleInput),
-      new ActionRowBuilder().addComponents(descriptionInput),
-    );
+    const titleLabel = new LabelBuilder().setLabel("Task title").setTextInputComponent(titleInput);
 
+    const descriptionLabel = new LabelBuilder()
+      .setLabel("Description (optional)")
+      .setTextInputComponent(descriptionInput);
+
+    const labels = [titleLabel, descriptionLabel];
+
+    try {
+      const projects = await projectService.listByUser(user.id, { status: "active" });
+
+      if (projects.length > 0) {
+        const projectSelect = buildProjectSelectForModal(projects, task.projectId ?? null, {
+          required: true,
+        });
+
+        const projectLabel = new LabelBuilder()
+          .setLabel("Project")
+          .setDescription("Change or remove project assignment")
+          .setStringSelectMenuComponent(projectSelect);
+
+        labels.push(projectLabel);
+      }
+    } catch (projectErr) {
+      console.error("[Task Dashboard] Failed to fetch projects for edit modal:", projectErr);
+    }
+
+    modal.addLabelComponents(...labels);
     await interaction.showModal(modal);
   } catch (err) {
     console.error("[Task Dashboard] Edit button error:", err);
-    await interaction.reply({
-      ...buildV2Message("Failed to open edit dialog. Please try again."),
-    });
+    await interaction.reply(buildV2Message("Failed to open edit dialog. Please try again."));
   }
 }
 
