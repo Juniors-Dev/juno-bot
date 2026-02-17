@@ -44,7 +44,7 @@ export async function handleProjectLinkEditModal(interaction) {
       selectedProject.links &&
       selectedLink.kind !== kind &&
       selectedProject.links.some(
-        (l) => l.id !== linkId && l.kind.toLowerCase() === kind.toLowerCase(),
+        (l) => String(l.id) !== String(linkId) && l.kind.toLowerCase() === kind.toLowerCase(),
       )
     ) {
       await interaction.followUp({
