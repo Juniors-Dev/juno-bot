@@ -386,6 +386,46 @@ export function buildV2Message(message, { type = "error" } = {}) {
   };
 }
 
+/**
+ * Build project select menu for modals
+ * @param {Array<{id: string, name: string}>} projects - User's active projects
+ * @param {string|null} currentProjectId - Currently selected project UUID
+ * @param {Object} options
+ * @param {boolean} options.required - Whether selection is required (default: false)
+ * @returns {StringSelectMenuBuilder} Configured select menu
+ */
+export function buildProjectSelectForModal(
+  projects,
+  currentProjectId = null,
+  { required = false } = {},
+) {
+  const options = [];
+
+  options.push(
+    new StringSelectMenuOptionBuilder()
+      .setLabel("No project")
+      .setValue("no_project")
+      .setDefault(currentProjectId == null),
+  );
+
+  for (const project of projects.slice(0, 24)) {
+    const isSelected = currentProjectId != null && String(project.id) === String(currentProjectId);
+
+    options.push(
+      new StringSelectMenuOptionBuilder()
+        .setLabel(truncate(project.name, 100) || "Unnamed Project")
+        .setValue(String(project.id))
+        .setDefault(isSelected),
+    );
+  }
+
+  return new StringSelectMenuBuilder()
+    .setCustomId("project_select")
+    .setPlaceholder("Select a project...")
+    .setRequired(required)
+    .addOptions(options);
+}
+
 //------ HELPERS ------
 function groupTasksByStatus(tasks) {
   return tasks.reduce((acc, task) => {
