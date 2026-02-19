@@ -9,6 +9,8 @@ import { projectEditModal } from "../features/projectHelper/project-edit-modal.j
 import { projectDeleteConfirmation } from "../features/projectHelper/project-delete.js";
 import { projectDeleteCancelHandler } from "../features/projectHelper/project-cancel-delete-handler.js";
 import { projectDeleteConfirmHandler } from "../features/projectHelper/project-confirm-delete-handler.js";
+import { projectArchiveHandler } from "../features/projectHelper/project-archive-handler.js";
+import { projectRestoreHandler } from "../features/projectHelper/project-restore-handler.js";
 import { handleDashboardButtons } from "../features/liveDashboard/handle-dashboard-buttons.js";
 
 export const buttonHandlers = {
@@ -54,6 +56,14 @@ export const buttonHandlers = {
   },
   confirm_project_delete: {
     run: projectDeleteConfirmHandler,
+    context: { needsUser: true, needsSession: false },
+  },
+  project_archive: {
+    run: projectArchiveHandler,
+    context: { needsUser: true, needsSession: false },
+  },
+  project_restore: {
+    run: projectRestoreHandler,
     context: { needsUser: true, needsSession: false },
   },
   dashboard: {
