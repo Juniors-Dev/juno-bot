@@ -1,4 +1,6 @@
-import { UniqueConstraintError } from "sequelize";
+import { UniqueConstraintError, Op } from "sequelize";
+import { DateTime } from "luxon";
+const TIMEZONE = "Europe/Oslo";
 
 export default class SessionService {
   constructor(db) {
@@ -93,6 +95,44 @@ export default class SessionService {
     const session = rows[0];
     const durationMs = new Date(session.endedAt) - new Date(session.startedAt);
     return { session, durationMs };
+  }
+
+  async getWorkedToday() {
+    const midnightOslo = DateTime.now().setZone(TIMEZONE).startOf("day").toJSDate();
+
+    const sessions = await this.Session.findAll({
+      where: {
+        startedAt: { [Op.gte]: midnightOslo },
+        endedAt: { [Op.ne]: null },
+      },
+      include: [
+        {
+          model: this.User,
+          as: "user",
+          attributes: ["id", "discordId", "name"],
+          required: true,
+        },
+      ],
+      order: [["endedAt", "DESC"]],
+    });
+
+    const userTotals = new Map();
+
+    for (const session of sessions) {
+      const userId = session.userId;
+      const durationMs = new Date(session.endedAt) - new Date(session.startedAt);
+
+      if (userTotals.has(userId)) {
+        userTotals.get(userId).totalMs += durationMs;
+      } else {
+        userTotals.set(userId, {
+          user: session.user,
+          totalMs: durationMs,
+        });
+      }
+    }
+
+    return Array.from(userTotals.values()).sort((a, b) => b.totalMs - a.totalMs);
   }
 
   async updateActivity(userId, activity) {
