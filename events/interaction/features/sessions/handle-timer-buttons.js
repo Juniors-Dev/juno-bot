@@ -8,7 +8,7 @@ export async function handleTimerButtons(interaction) {
 
   try {
     const { user } = interaction.botContext;
-    const { sessionService } = interaction.services;
+    const { sessionService, taskService } = interaction.services;
     const parts = interaction.customId.split(":");
     const action = parts[1];
     const sessionId = parts[parts.length - 1];
@@ -57,7 +57,8 @@ export async function handleTimerButtons(interaction) {
         });
       }
 
-      const payload = buildClockOutMessagePayload(result);
+      const tasksWorkedOn = await taskService.getTasksForSession(result.session.id);
+      const payload = buildClockOutMessagePayload(result, { tasksWorkedOn });
       return interaction.editReply(payload);
     }
   } catch (err) {

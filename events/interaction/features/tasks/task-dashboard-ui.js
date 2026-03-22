@@ -12,6 +12,7 @@ import {
 } from "discord.js";
 import { TASK_STATUS } from "../../../../services/TaskService.js";
 
+// ------ CONFIGURATION ------
 export const STATUS_CONFIG = {
   [TASK_STATUS.IN_PROGRESS]: { emoji: "🔵", label: "In Progress", color: 0x3498db },
   [TASK_STATUS.TODO]: { emoji: "🟡", label: "Todo", color: 0xf1c40f },
@@ -30,6 +31,7 @@ const FILTER_OPTIONS = [
 const DISCORD_SELECT_LIMIT = 25;
 const TASK_PREVIEW_LIMIT = 20;
 
+// ------ MAIN DASHBOARD BUILDERS ------
 /**
  * Build the task dashboard UI (Components v2)
  * @param {Array} tasks - User's tasks
@@ -149,7 +151,7 @@ export function buildTaskDashboard(
 
     components.push(new ActionRowBuilder().addComponents(taskSelect));
   }
-  
+
   return {
     components,
     flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
@@ -161,9 +163,13 @@ export function buildTaskDashboard(
  * @param {Object} task - The task to display
  * @param {Object} options
  * @param {boolean} options.hasActiveSession - Whether user is clocked in
+ * @param {number|null} options.currentTaskId - ID of the task linked to current session
  * @param {string|null} options.notification - Optional notification message
  */
-export function buildTaskDetail(task, { hasActiveSession = false, notification = null } = {}) {
+export function buildTaskDetail(
+  task,
+  { hasActiveSession = false, currentTaskId = null, notification = null } = {},
+) {
   const config = STATUS_CONFIG[task.status] || STATUS_CONFIG[TASK_STATUS.TODO];
   const components = [];
 
@@ -173,25 +179,38 @@ export function buildTaskDetail(task, { hasActiveSession = false, notification =
 
   const container = new ContainerBuilder().setAccentColor(config.color || 0x5865f2);
 
-  const canStartWorking =
-    !hasActiveSession && task.status !== TASK_STATUS.DONE && task.status !== TASK_STATUS.ARCHIVED;
+  const isActionable = task.status !== TASK_STATUS.DONE && task.status !== TASK_STATUS.ARCHIVED;
+  const isCurrentTask = currentTaskId != null && String(currentTaskId) === String(task.id);
 
-  if (canStartWorking) {
+  let headerButton = null;
+
+  if (isActionable) {
+    if (!hasActiveSession) {
+      headerButton = (button) =>
+        button
+          .setCustomId(`tasks:start_working:${task.id}`)
+          .setLabel("Start Working")
+          .setStyle(ButtonStyle.Success);
+    } else if (!isCurrentTask) {
+      headerButton = (button) =>
+        button
+          .setCustomId(`tasks:switch_to:${task.id}`)
+          .setLabel("Work on this")
+          .setStyle(ButtonStyle.Primary);
+    }
+  }
+
+  if (!headerButton) {
+    container.addTextDisplayComponents((textDisplay) =>
+      textDisplay.setContent(`## ${config.emoji} ${task.title}`),
+    );
+  } else {
     container.addSectionComponents((section) =>
       section
         .addTextDisplayComponents((textDisplay) =>
           textDisplay.setContent(`## ${config.emoji} ${task.title}`),
         )
-        .setButtonAccessory((button) =>
-          button
-            .setCustomId(`tasks:start_working:${task.id}`)
-            .setLabel("Start Working")
-            .setStyle(ButtonStyle.Success),
-        ),
-    );
-  } else {
-    container.addTextDisplayComponents((textDisplay) =>
-      textDisplay.setContent(`## ${config.emoji} ${task.title}`),
+        .setButtonAccessory(headerButton),
     );
   }
 
@@ -313,6 +332,7 @@ export function buildTaskDetail(task, { hasActiveSession = false, notification =
   };
 }
 
+// ------ CONFIRMATION & UTILITY BUILDERS ------
 export function buildDeleteConfirmation(task) {
   const components = [];
 
@@ -366,7 +386,47 @@ export function buildV2Message(message, { type = "error" } = {}) {
   };
 }
 
-// --- Helpers ---
+/**
+ * Build project select menu for modals
+ * @param {Array<{id: string, name: string}>} projects - User's active projects
+ * @param {string|null} currentProjectId - Currently selected project UUID
+ * @param {Object} options
+ * @param {boolean} options.required - Whether selection is required (default: false)
+ * @returns {StringSelectMenuBuilder} Configured select menu
+ */
+export function buildProjectSelectForModal(
+  projects,
+  currentProjectId = null,
+  { required = false } = {},
+) {
+  const options = [];
+
+  options.push(
+    new StringSelectMenuOptionBuilder()
+      .setLabel("No project")
+      .setValue("no_project")
+      .setDefault(currentProjectId == null),
+  );
+
+  for (const project of projects.slice(0, 24)) {
+    const isSelected = currentProjectId != null && String(project.id) === String(currentProjectId);
+
+    options.push(
+      new StringSelectMenuOptionBuilder()
+        .setLabel(truncate(project.name, 100) || "Unnamed Project")
+        .setValue(String(project.id))
+        .setDefault(isSelected),
+    );
+  }
+
+  return new StringSelectMenuBuilder()
+    .setCustomId("project_select")
+    .setPlaceholder("Select a project...")
+    .setRequired(required)
+    .addOptions(options);
+}
+
+//------ HELPERS ------
 function groupTasksByStatus(tasks) {
   return tasks.reduce((acc, task) => {
     const status = task.status || TASK_STATUS.TODO;
