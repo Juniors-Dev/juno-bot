@@ -4,7 +4,7 @@ import { cancelTimer } from "../../../../features/session/timerManager.js";
 
 export async function handleClockOutButton(interaction) {
   const { user, session } = interaction.botContext;
-  const { sessionService } = interaction.services;
+  const { sessionService, taskService } = interaction.services;
 
   await interaction.deferUpdate();
 
@@ -22,7 +22,8 @@ export async function handleClockOutButton(interaction) {
       });
     }
 
-    const payload = buildClockOutMessagePayload(result);
+    const tasksWorkedOn = await taskService.getTasksForSession(result.session.id);
+    const payload = buildClockOutMessagePayload(result, { tasksWorkedOn });
     return interaction.editReply(payload);
   } catch (err) {
     console.error("[Session Guard] Clock-out button error:", err);
