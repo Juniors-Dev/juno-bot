@@ -2,7 +2,7 @@ import { ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder } from
 
 export async function projectCreateLinkModal(interaction) {
   const [customId, projectId] = interaction.customId.split(":");
-  if (!customId === "project_link_create") return;
+  if (customId !== "project_link_create") return;
   if (!interaction.botContext.user) return;
   const modal = new ModalBuilder()
     .setCustomId(`create_project_link_modal:${projectId}`)

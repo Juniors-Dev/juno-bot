@@ -8,7 +8,7 @@ export async function handleProjectLinkEditModal(interaction) {
   if (customId !== "edit_project_link_modal") return;
   const { user } = interaction.botContext;
   if (!user) return;
-  await interaction.deferUpdate({ flags: MessageFlags.Ephemeral });
+  await interaction.deferUpdate();
   try {
     const { projectService, linkService } = interaction.services;
     const existingProjects = await projectService.listByUser(user.id);
@@ -44,7 +44,7 @@ export async function handleProjectLinkEditModal(interaction) {
       selectedProject.links &&
       selectedLink.kind !== kind &&
       selectedProject.links.some(
-        (l) => l.id !== linkId && l.kind.toLowerCase() === kind.toLowerCase(),
+        (l) => String(l.id) !== String(linkId) && l.kind.toLowerCase() === kind.toLowerCase(),
       )
     ) {
       await interaction.followUp({

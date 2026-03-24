@@ -2,7 +2,7 @@ import { ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder } from
 
 export async function projectEditLinkModal(interaction) {
   const [customId, linkId, projectId] = interaction.customId.split(":");
-  if (!customId === "project_link_edit") return;
+  if (customId !== "project_link_edit") return;
   const { user } = interaction.botContext;
   if (!user) return;
   const { linkService } = interaction.services;
