@@ -1,6 +1,7 @@
 import { MessageFlags } from "discord.js";
 import { buildClockOutMessagePayload } from "../../../../features/session/messageBuilder.js";
 import { cancelTimer } from "../../../../features/session/timerManager.js";
+import { requestDashboardUpdate } from "../../../../features/liveDashboard/dashboardUpdater.js";
 
 export async function handleClockOutButton(interaction) {
   const { user, session } = interaction.botContext;
@@ -24,7 +25,10 @@ export async function handleClockOutButton(interaction) {
 
     const tasksWorkedOn = await taskService.getTasksForSession(result.session.id);
     const payload = buildClockOutMessagePayload(result, { tasksWorkedOn });
-    return interaction.editReply(payload);
+
+    await interaction.editReply(payload);
+
+    requestDashboardUpdate(interaction.client);
   } catch (err) {
     console.error("[Session Guard] Clock-out button error:", err);
     return interaction.followUp({

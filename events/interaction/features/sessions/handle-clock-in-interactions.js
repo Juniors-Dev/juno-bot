@@ -1,6 +1,7 @@
 import { ModalBuilder, TextInputBuilder, TextInputStyle, LabelBuilder } from "discord.js";
 import { buildClockInMessagePayload } from "../../../../features/session/messageBuilder.js";
 import { startTimer } from "../../../../features/session/timerManager.js";
+import { requestDashboardUpdate } from "../../../../features/liveDashboard/dashboardUpdater.js";
 import { getClockInState, setClockInState, clearClockInState } from "./clock-in-state.js";
 import {
   DEFAULT_SESSION_MINUTES,
@@ -130,7 +131,9 @@ export async function handleNewTaskModal(interaction) {
       activity,
     });
 
-    return interaction.editReply(payload);
+    await interaction.editReply(payload);
+
+    requestDashboardUpdate(interaction.client);
   } catch (err) {
     console.error("[Clock-in New Task] Error:", err);
     return interaction.editReply({
@@ -199,7 +202,9 @@ export async function handleDurationModal(interaction) {
       activity,
     });
 
-    return interaction.editReply(payload);
+    await interaction.editReply(payload);
+
+    requestDashboardUpdate(interaction.client);
   } catch (err) {
     console.error("[Clock-in Duration Modal] Error:", err);
     return interaction.editReply({

@@ -1,5 +1,6 @@
 import { ModalBuilder, TextInputBuilder, TextInputStyle, LabelBuilder } from "discord.js";
 import { buildTaskDetail, buildV2Message, STATUS_CONFIG } from "../../task-dashboard-ui.js";
+import { requestDashboardUpdate } from "../../../../../../features/liveDashboard/dashboardUpdater.js";
 import {
   DEFAULT_SESSION_MINUTES,
   MIN_SESSION_MINUTES,
@@ -130,6 +131,8 @@ async function handleSwitchToTask(interaction) {
     });
 
     await interaction.editReply(payload);
+
+    requestDashboardUpdate(interaction.client);
   } catch (err) {
     console.error("[Task Dashboard] Switch task error:", err);
     await interaction.editReply(buildV2Message("Something went wrong switching tasks."));

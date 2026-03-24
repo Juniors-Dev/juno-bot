@@ -3,6 +3,7 @@ import { clearState } from "../../task-dashboard-state.js";
 import { buildV2Message } from "../../task-dashboard-ui.js";
 import { buildClockInMessagePayload } from "../../../../../../features/session/messageBuilder.js";
 import { startTimer } from "../../../../../../features/session/timerManager.js";
+import { requestDashboardUpdate } from "../../../../../../features/liveDashboard/dashboardUpdater.js";
 import { TASK_STATUS } from "../../../../../../services/TaskService.js";
 import {
   DEFAULT_SESSION_MINUTES,
@@ -69,6 +70,8 @@ async function handleStartWorking(interaction) {
     });
 
     await interaction.followUp({ ...clockInPayload, flags: MessageFlags.Ephemeral });
+
+    requestDashboardUpdate(interaction.client);
   } catch (err) {
     console.error("[Task Dashboard] Start working modal error:", err);
     await interaction.editReply(buildV2Message("Something went wrong starting your session."));

@@ -11,6 +11,7 @@ import { projectDeleteCancelHandler } from "../features/projectHelper/project-ca
 import { projectDeleteConfirmHandler } from "../features/projectHelper/project-confirm-delete-handler.js";
 import { projectArchiveHandler } from "../features/projectHelper/project-archive-handler.js";
 import { projectRestoreHandler } from "../features/projectHelper/project-restore-handler.js";
+import { handleDashboardButtons } from "../features/liveDashboard/handle-dashboard-buttons.js";
 
 export const buttonHandlers = {
   create_user_modal_button: {
@@ -64,5 +65,9 @@ export const buttonHandlers = {
   project_restore: {
     run: projectRestoreHandler,
     context: { needsUser: true, needsSession: false },
+  },
+  dashboard: {
+    run: handleDashboardButtons,
+    context: { needsUser: true, needsSession: true },
   },
 };

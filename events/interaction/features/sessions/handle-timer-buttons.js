@@ -2,6 +2,7 @@ import { time, TimestampStyles, MessageFlags } from "discord.js";
 import { formatMinutesHm } from "../../../../utils/formatTime.js";
 import { extendTimer, cancelTimer } from "../../../../features/session/timerManager.js";
 import { buildClockOutMessagePayload } from "../../../../features/session/messageBuilder.js";
+import { requestDashboardUpdate } from "../../../../features/liveDashboard/dashboardUpdater.js";
 
 export async function handleTimerButtons(interaction) {
   await interaction.deferUpdate();
@@ -45,6 +46,8 @@ export async function handleTimerButtons(interaction) {
           `_You'll receive another warning before it ends._`,
         components: [],
       });
+
+      requestDashboardUpdate(interaction.client);
     } else if (action === "clockout") {
       cancelTimer(sessionId);
 
@@ -59,7 +62,10 @@ export async function handleTimerButtons(interaction) {
 
       const tasksWorkedOn = await taskService.getTasksForSession(result.session.id);
       const payload = buildClockOutMessagePayload(result, { tasksWorkedOn });
-      return interaction.editReply(payload);
+
+      await interaction.editReply(payload);
+
+      requestDashboardUpdate(interaction.client);
     }
   } catch (err) {
     console.error("[Timer Button] Error:", err);
