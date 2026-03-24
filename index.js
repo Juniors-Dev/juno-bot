@@ -7,6 +7,7 @@ import { required } from "./utils/envHelpers.js";
 import addJobs from "./utils/addJobs.js";
 import { adminDb } from "./models/index.js";
 import services from "./services/index.js";
+import { initializeLiveDashboard } from "./features/liveDashboard/setupOnStartup.js";
 
 // ---- Read ENV ----
 const TOKEN = required("token");
@@ -51,6 +52,7 @@ await addEvents(client);
 client.once("ready", async (readyClient) => {
   console.log(`Ready! Logged in as ${readyClient.user.tag}`);
   await restoreTimersOnStartup(client);
+  await initializeLiveDashboard(client);
   addJobs(client);
 });
 

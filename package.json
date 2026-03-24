@@ -26,8 +26,9 @@
   },
   "homepage": "https://github.com/johnDavid97/Juno-bot#readme",
   "dependencies": {
-    "discord.js": "^14.20.0",
+    "discord.js": "^14.25.1",
     "dotenv": "^16.6.1",
+    "luxon": "^3.7.2",
     "node-cron": "^4.1.1",
     "pg": "^8.16.3",
     "pg-hstore": "^2.3.4",

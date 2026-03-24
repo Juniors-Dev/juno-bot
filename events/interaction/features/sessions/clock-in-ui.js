@@ -79,7 +79,7 @@ export function buildClockInUI(tasks = [], { selectedTaskId = null } = {}) {
   components.push(new ActionRowBuilder().addComponents(buttons));
 
   const taskCount = tasks.length;
-  let content = "## ⏱️ Clock In\n\n";
+  let content = "## Clock In\n\n";
 
   if (taskCount > 0) {
     content += `You have **${taskCount}** active task${taskCount === 1 ? "" : "s"}.\n`;
