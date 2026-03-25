@@ -5,12 +5,13 @@ import { handleClockOutButton } from "../features/sessions/handle-clock-out-butt
 import { handleTimerButtons } from "../features/sessions/handle-timer-buttons.js";
 import { handleTaskButtons } from "../features/tasks/handlers/buttons/index.js";
 import { projectCreateModal } from "../features/projectHelper/project-create-modal.js";
-import { projectEditModal } from "../features/projectHelper/project-edit-modal.js";
 import { projectDeleteConfirmation } from "../features/projectHelper/project-delete.js";
 import { projectDeleteCancelHandler } from "../features/projectHelper/project-cancel-delete-handler.js";
 import { projectDeleteConfirmHandler } from "../features/projectHelper/project-confirm-delete-handler.js";
 import { projectArchiveHandler } from "../features/projectHelper/project-archive-handler.js";
 import { projectRestoreHandler } from "../features/projectHelper/project-restore-handler.js";
+import { projectEditModal } from "../features/projectHelper/project-edit-modal.js";
+import { projectLinkButtonHandlers } from "../features/projectHelper/links/index.js";
 import { handleDashboardButtons } from "../features/liveDashboard/handle-dashboard-buttons.js";
 
 export const buttonHandlers = {
@@ -42,10 +43,6 @@ export const buttonHandlers = {
     run: projectCreateModal,
     context: { needsUser: true, needsSession: false },
   },
-  project_edit: {
-    run: projectEditModal,
-    context: { needsUser: true, needsSession: false },
-  },
   project_delete: {
     run: projectDeleteConfirmation,
     context: { needsUser: true, needsSession: false },
@@ -66,6 +63,11 @@ export const buttonHandlers = {
     run: projectRestoreHandler,
     context: { needsUser: true, needsSession: false },
   },
+  project_edit: {
+    run: projectEditModal,
+    context: { needsUser: true, needsSession: false },
+  },
+  ...projectLinkButtonHandlers,
   dashboard: {
     run: handleDashboardButtons,
     context: { needsUser: true, needsSession: true },

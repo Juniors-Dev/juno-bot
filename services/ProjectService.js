@@ -59,6 +59,11 @@ export default class ProjectService {
             },
           ],
         },
+        {
+          model: this.Link,
+          as: "links",
+          attributes: ["id", "kind", "url", "description"],
+        },
       ],
       order: [["updatedAt", "DESC"]],
     });
@@ -72,6 +77,11 @@ export default class ProjectService {
           model: this.ProjectMember,
           as: "projectMembers",
           where: { userId },
+        },
+        {
+          model: this.Link,
+          as: "links",
+          attributes: ["id", "kind", "url", "description"],
         },
       ],
       order: [["updatedAt", "DESC"]],
@@ -237,39 +247,6 @@ export default class ProjectService {
       where: { projectId, userId: targetId },
     });
 
-    return this.getById(projectId);
-  }
-
-  // LINKS
-  async addLink({ projectId, userId, kind, url, description }) {
-    const project = await this.Project.findOne({
-      where: { id: projectId },
-      include: [{ model: this.ProjectMember, as: "projectMembers" }],
-    });
-    if (!project) throw new Error("Project not found.");
-
-    const member = project.projectMembers.find((m) => m.userId === userId);
-    if (!member) throw new Error("You’re not part of this project.");
-    if (!member.isAdmin && !member.canAddLinks)
-      throw new Error("You don’t have permission to add links.");
-
-    return this.Link.create({ projectId, kind, url, description });
-  }
-
-  async removeLink({ projectId, userId, linkId }) {
-    const project = await this.Project.findOne({
-      where: { id: projectId },
-      include: [{ model: this.ProjectMember, as: "projectMembers" }],
-    });
-    if (!project) throw new Error("Project not found.");
-
-    const member = project.projectMembers.find((m) => m.userId === userId);
-    if (!member?.isAdmin) throw new Error("You don’t have permission to remove links.");
-
-    const link = await this.Link.findOne({ where: { id: linkId, projectId } });
-    if (!link) throw new Error("Link not found in this project.");
-
-    await this.Link.destroy({ where: { id: linkId, projectId } });
     return this.getById(projectId);
   }
 }
