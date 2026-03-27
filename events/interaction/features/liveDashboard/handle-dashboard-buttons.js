@@ -1,5 +1,5 @@
 import { MessageFlags } from "discord.js";
-import { buildClockInUI } from "../sessions/clock-in-ui.js";
+import { buildClockInUI } from "../../../../features/session/clockInUI.js";
 import { buildClockOutMessagePayload } from "../../../../features/session/messageBuilder.js";
 import { cancelTimer } from "../../../../features/session/timerManager.js";
 import { requestDashboardUpdate } from "../../../../features/liveDashboard/dashboardUpdater.js";

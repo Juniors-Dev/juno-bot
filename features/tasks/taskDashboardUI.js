@@ -10,7 +10,7 @@ import {
   TimestampStyles,
   time,
 } from "discord.js";
-import { TASK_STATUS } from "../../../../services/TaskService.js";
+import { TASK_STATUS } from "../../services/TaskService.js";
 
 // ------ CONFIGURATION ------
 export const STATUS_CONFIG = {

@@ -1,5 +1,9 @@
 import { ModalBuilder, TextInputBuilder, TextInputStyle, LabelBuilder } from "discord.js";
-import { buildTaskDetail, buildV2Message, STATUS_CONFIG } from "../../task-dashboard-ui.js";
+import {
+  buildTaskDetail,
+  buildV2Message,
+  STATUS_CONFIG,
+} from "../../../../../../features/tasks/taskDashboardUI.js";
 import { requestDashboardUpdate } from "../../../../../../features/liveDashboard/dashboardUpdater.js";
 import {
   DEFAULT_SESSION_MINUTES,

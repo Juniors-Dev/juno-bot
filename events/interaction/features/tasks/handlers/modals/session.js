@@ -1,6 +1,6 @@
 import { MessageFlags } from "discord.js";
 import { clearState } from "../../task-dashboard-state.js";
-import { buildV2Message } from "../../task-dashboard-ui.js";
+import { buildV2Message } from "../../../../../../features/tasks/taskDashboardUI.js";
 import { buildClockInMessagePayload } from "../../../../../../features/session/messageBuilder.js";
 import { startTimer } from "../../../../../../features/session/timerManager.js";
 import { requestDashboardUpdate } from "../../../../../../features/liveDashboard/dashboardUpdater.js";
