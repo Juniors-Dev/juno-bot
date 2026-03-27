@@ -1,6 +1,7 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, time, TimestampStyles } from "discord.js";
 import services from "../../services/index.js";
 import { minutesFromMs, formatDurationMs } from "../../utils/formatTime.js";
+import { requestDashboardUpdate } from "../liveDashboard/dashboardUpdater.js";
 import {
   DEFAULT_SESSION_MINUTES,
   WARN_BEFORE_MINUTES,
@@ -41,7 +42,7 @@ export function startTimer(client, session, durationMinutes = DEFAULT_SESSION_MI
 
   if (endDelayMilliseconds > 0) {
     endTimeout = setTimeout(() => {
-      scheduleGracePeriodAt(session, endTimestamp);
+      scheduleGracePeriodAt(client, session, endTimestamp);
     }, endDelayMilliseconds);
 
     timerRegistry.set(sessionId, {
@@ -61,7 +62,7 @@ export function startTimer(client, session, durationMinutes = DEFAULT_SESSION_MI
       graceTimeout: null,
       warningMessage: null,
     });
-    scheduleGracePeriodAt(session, endTimestamp);
+    scheduleGracePeriodAt(client, session, endTimestamp);
   }
 }
 
@@ -142,7 +143,7 @@ async function sendWarningDM(client, session, endTimestampMs) {
   }
 }
 
-function scheduleGracePeriodAt(session, endTimestampMs) {
+function scheduleGracePeriodAt(client, session, endTimestampMs) {
   const sessionId = session.id;
   const graceEndTimestamp = endTimestampMs + GRACE_PERIOD_MINUTES * 60000;
   const delayMs = Math.max(0, graceEndTimestamp - Date.now());
@@ -152,7 +153,7 @@ function scheduleGracePeriodAt(session, endTimestampMs) {
   if (registryEntry?.endTimeout) clearTimeout(registryEntry.endTimeout);
 
   const graceTimeout = setTimeout(async () => {
-    await autoEndSession(session.userId, sessionId);
+    await autoEndSession(client, session.userId, sessionId);
   }, delayMs);
 
   if (registryEntry) {
@@ -171,7 +172,7 @@ function scheduleGracePeriodAt(session, endTimestampMs) {
   );
 }
 
-async function autoEndSession(userId, sessionId) {
+async function autoEndSession(client, userId, sessionId) {
   const registryEntry = timerRegistry.get(sessionId);
 
   try {
@@ -199,6 +200,7 @@ async function autoEndSession(userId, sessionId) {
           console.error(`[Timer] autoEndSession: failed to edit warning message:`, editErr.message);
         }
       }
+      requestDashboardUpdate(client);
     } else {
       console.log(`[Timer] autoEndSession: session ${sessionId} already ended`);
     }
