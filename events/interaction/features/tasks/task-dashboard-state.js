@@ -1,4 +1,4 @@
-import { TASK_STATUS } from "../../../../services/TaskService.js";
+import { fetchFilteredTasks } from "./task-dashboard-helpers.js";
 
 const dashboardState = new Map();
 const dashboardStateTimeouts = new Map();
@@ -39,31 +39,6 @@ export function clearState(userId) {
     clearTimeout(existingTimeout);
     dashboardStateTimeouts.delete(userId);
   }
-}
-
-/**
- * Fetch tasks based on filter value
- * @param {Object} taskService - TaskService instance
- * @param {string} userId - Internal user UUID
- * @param {string} filter - Filter value (active, todo, in_progress, done, all)
- * @returns {Promise<Array>} Filtered tasks with project info
- */
-export async function fetchFilteredTasks(taskService, userId, filter) {
-  const filterMap = {
-    active: [TASK_STATUS.TODO, TASK_STATUS.IN_PROGRESS],
-    [TASK_STATUS.TODO]: TASK_STATUS.TODO,
-    [TASK_STATUS.IN_PROGRESS]: TASK_STATUS.IN_PROGRESS,
-    [TASK_STATUS.DONE]: TASK_STATUS.DONE,
-    all: null,
-  };
-
-  const status =
-    filter in filterMap ? filterMap[filter] : [TASK_STATUS.TODO, TASK_STATUS.IN_PROGRESS];
-
-  return taskService.getByUser(userId, {
-    status,
-    includeProject: true,
-  });
 }
 
 export async function refreshDashboard(interaction) {
