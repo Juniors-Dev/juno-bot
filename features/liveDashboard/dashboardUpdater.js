@@ -84,10 +84,6 @@ async function performUpdate(client) {
   if (edited > 0) {
     lastEditAt = Date.now();
   }
-  console.log(
-    `[LiveDashboard] Updated ${edited}/${dashboards.length} dashboard(s) — ` +
-      `${activeSessions.length} active, ${workedToday.length} worked today`,
-  );
 }
 
 //Update a dashboard. Handles cleanup if message/channel no longer exists.
