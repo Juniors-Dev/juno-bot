@@ -5,6 +5,7 @@ import {
   buildDeleteConfirmation,
   buildV2Message,
   buildProjectSelectForModal,
+  buildArchiveConfirmation,
 } from "../../task-dashboard-ui.js";
 
 async function handleNew(interaction) {
@@ -128,28 +129,42 @@ async function handleEdit(interaction) {
 async function handleArchive(interaction) {
   const { user } = interaction.botContext;
   const { taskService } = interaction.services;
+  const taskId = parseInt(interaction.customId.split(":")[2], 10);
 
+  await interaction.deferUpdate();
+
+  try {
+    const task = await taskService.getById(taskId, user.id);
+    if (!task)
+      return interaction.editReply(buildV2Message("⚠️ Task not found.", { type: "warning" }));
+
+    await interaction.editReply(buildArchiveConfirmation(task));
+  } catch (err) {
+    console.error("[Task Dashboard] Archive error:", err);
+    await interaction.editReply(buildV2Message("Something went wrong."));
+  }
+}
+
+async function handleArchiveConfirm(interaction) {
+  const { user } = interaction.botContext;
+  const { taskService } = interaction.services;
   const taskId = parseInt(interaction.customId.split(":")[2], 10);
 
   await interaction.deferUpdate();
 
   try {
     const archived = await taskService.archive(taskId, user.id);
-
-    if (!archived) {
+    if (!archived)
       return interaction.editReply(
         buildV2Message("⚠️ Task not found or could not be archived.", { type: "warning" }),
       );
-    }
 
     const { filter, tasks } = await refreshDashboard(interaction);
-    const payload = buildTaskDashboard(tasks, {
-      filter,
-      notification: "📦 Task archived.",
-    });
-    await interaction.editReply(payload);
+    await interaction.editReply(
+      buildTaskDashboard(tasks, { filter, notification: "📦 Task archived." }),
+    );
   } catch (err) {
-    console.error("[Task Dashboard] Archive error:", err);
+    console.error("[Task Dashboard] Archive confirm error:", err);
     await interaction.editReply(buildV2Message("Something went wrong archiving the task."));
   }
 }
@@ -212,4 +227,5 @@ export const buttonHandlers = {
   archive: handleArchive,
   delete: handleDelete,
   delete_confirm: handleDeleteConfirm,
+  archive_confirm: handleArchiveConfirm,
 };
