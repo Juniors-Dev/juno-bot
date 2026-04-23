@@ -1,5 +1,9 @@
 import { setState, refreshDashboard } from "../../task-dashboard-state.js";
-import { buildTaskDashboard, buildTaskDetail, buildV2Message } from "../../task-dashboard-ui.js";
+import {
+  buildTaskDashboard,
+  buildTaskDetail,
+  buildV2Message,
+} from "../../../../../../features/tasks/taskDashboardUI.js";
 import { getTaskDetailContext } from "../../task-dashboard-helpers.js";
 
 async function handleFilter(interaction) {

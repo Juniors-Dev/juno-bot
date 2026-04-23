@@ -6,7 +6,7 @@ import {
   buildV2Message,
   buildProjectSelectForModal,
   buildArchiveConfirmation,
-} from "../../task-dashboard-ui.js";
+} from "../../../../../../features/tasks/taskDashboardUI.js";
 
 async function handleNew(interaction) {
   const { user } = interaction.botContext;

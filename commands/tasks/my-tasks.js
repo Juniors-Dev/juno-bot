@@ -4,7 +4,7 @@ import {
   ContainerBuilder,
   TextDisplayBuilder,
 } from "discord.js";
-import { buildTaskDashboard } from "../../events/interaction/features/tasks/task-dashboard-ui.js";
+import { buildTaskDashboard } from "../../features/tasks/taskDashboardUI.js";
 import { fetchFilteredTasks } from "../../events/interaction/features/tasks/task-dashboard-helpers.js";
 import { TASK_STATUS } from "../../services/TaskService.js";
 

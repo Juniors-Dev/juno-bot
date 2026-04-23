@@ -54,7 +54,7 @@ export function buildLiveDashboardUI({ activeSessions = [], workedToday = [] } =
   //WORKED TODAY
   const totalWorkedMs = workedToday.reduce((sum, w) => sum + w.totalMs, 0);
   const totalFormatted =
-    totalWorkedMs > 0 ? `  —  ${formatDurationMs(totalWorkedMs, { mode: "floor" })}` : "";
+    totalWorkedMs > 0 ? ` (${formatDurationMs(totalWorkedMs, { mode: "floor" })})` : "";
 
   container.addTextDisplayComponents((text) =>
     text.setContent(`### Worked Today${totalFormatted}`),

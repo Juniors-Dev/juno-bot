@@ -6,7 +6,7 @@ import {
   ButtonStyle,
   MessageFlags,
 } from "discord.js";
-import { TASK_STATUS } from "../../../../services/TaskService.js";
+import { TASK_STATUS } from "../../services/TaskService.js";
 
 /**
  * Build the clock-in task selection UI

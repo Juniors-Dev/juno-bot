@@ -1,5 +1,5 @@
 import { MessageFlags } from "discord.js";
-import { buildClockInUI } from "./clock-in-ui.js";
+import { buildClockInUI } from "../../../../features/session/clockInUI.js";
 
 export async function handleClockInButton(interaction) {
   const { user } = interaction.botContext;

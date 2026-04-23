@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, MessageFlags } from "discord.js";
-import { buildClockInUI } from "../../events/interaction/features/sessions/clock-in-ui.js";
+import { buildClockInUI } from "../../features/session/clockInUI.js";
 import { requireNoActiveSession } from "../../guards/index.js";
 
 export default {

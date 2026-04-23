@@ -1,5 +1,9 @@
 import { refreshDashboard } from "../../task-dashboard-state.js";
-import { buildTaskDashboard, buildTaskDetail, buildV2Message } from "../../task-dashboard-ui.js";
+import {
+  buildTaskDashboard,
+  buildTaskDetail,
+  buildV2Message,
+} from "../../../../../../features/tasks/taskDashboardUI.js";
 import { getTaskDetailContext } from "../../task-dashboard-helpers.js";
 import { TASK_STATUS } from "../../../../../../services/TaskService.js";
 
