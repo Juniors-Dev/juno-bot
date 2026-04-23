@@ -2,6 +2,7 @@ import { SlashCommandBuilder, MessageFlags } from "discord.js";
 import { buildClockOutMessagePayload } from "../../features/session/messageBuilder.js";
 import { requireActiveSession } from "../../guards/index.js";
 import { cancelTimer } from "../../features/session/timerManager.js";
+import { requestDashboardUpdate } from "../../features/liveDashboard/dashboardUpdater.js";
 
 export default {
   data: new SlashCommandBuilder()
@@ -25,7 +26,7 @@ export default {
 
       const payload = buildClockOutMessagePayload(result, { tasksWorkedOn });
       await interaction.editReply(payload);
-      // TODO: Update dashboard
+      requestDashboardUpdate(interaction.client);
     } catch (err) {
       console.error("Clock-out error:", err);
       await interaction.editReply("Something went wrong..👀");

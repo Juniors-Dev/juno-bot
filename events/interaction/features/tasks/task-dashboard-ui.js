@@ -346,7 +346,7 @@ export function buildDeleteConfirmation(task) {
 
   container.addTextDisplayComponents((textDisplay) =>
     textDisplay.setContent(
-      `Are you sure you want to delete **"${truncate(task.title, 100)}"**?\n\n_This cannot be undone._`,
+      `Are you sure you want to delete **"${task.title}"**?\n\n_This cannot be undone._`,
     ),
   );
 
@@ -369,6 +369,32 @@ export function buildDeleteConfirmation(task) {
     components,
     flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
   };
+}
+
+export function buildArchiveConfirmation(task) {
+  const container = new ContainerBuilder().setAccentColor(0xf1c40f);
+
+  container.addTextDisplayComponents((textDisplay) =>
+    textDisplay.setContent(
+      `Archive **"${task.title}"**?\n\n_You won't be able to restore this task._`,
+    ),
+  );
+
+  const components = [
+    container,
+    new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId(`tasks:archive_confirm:${task.id}`)
+        .setLabel("Archive")
+        .setStyle(ButtonStyle.Secondary),
+      new ButtonBuilder()
+        .setCustomId(`tasks:back_to_detail:${task.id}`)
+        .setLabel("Cancel")
+        .setStyle(ButtonStyle.Secondary),
+    ),
+  ];
+
+  return { components, flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2 };
 }
 
 export function buildV2Message(message, { type = "error" } = {}) {

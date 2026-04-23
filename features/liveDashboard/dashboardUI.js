@@ -14,7 +14,7 @@ export function buildLiveDashboardUI({ activeSessions = [], workedToday = [] } =
   const now = new Date();
 
   const container = new ContainerBuilder().setAccentColor(
-    activeSessions.length > 0 ? 0x57f287 : 0x5865f2,
+    activeSessions.length > 0 ? 0x57f287 : 0x1c1c84,
   );
 
   //HEADER

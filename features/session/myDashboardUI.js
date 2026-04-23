@@ -42,7 +42,7 @@ export function buildMyDashboardUI(user, stats) {
   );
   const selectedValue = anchor.isValid ? anchor.toFormat("yyyy-MM") : currentMonthValue;
   const shortMonth = anchor.isValid ? anchor.toFormat("MMM yyyy") : stats.monthLabel;
-  const container = new ContainerBuilder().setAccentColor(0x1f8b8c);
+  const container = new ContainerBuilder().setAccentColor(0x5865f2);
 
   container.addTextDisplayComponents((text) =>
     text.setContent(`## 👤 ${user.name} • ${shortMonth}\n-# This month's work sessions`),
