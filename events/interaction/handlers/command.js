@@ -10,10 +10,16 @@ export async function handleChatInputCommand(interaction) {
   }
 
   try {
-    const context = await buildInteractionContext(interaction);
-    if (!context) return;
-
-    interaction.botContext = context;
+    /**
+     * Commands can opt out of the user/session lookup by setting
+     * `skipContext: true` on their default export. Used for commands
+     * that must run even when the DB is down (e.g. /health).
+     */
+    if (!command.skipContext) {
+      const botContext = await buildInteractionContext(interaction);
+      if (!botContext) return;
+      interaction.botContext = botContext;
+    }
 
     if (command.guards?.length) {
       const passed = await runGuards(command.guards, interaction);
