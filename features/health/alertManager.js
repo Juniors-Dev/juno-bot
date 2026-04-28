@@ -54,10 +54,6 @@ function failureReasons(result) {
 async function post(client, content) {
   try {
     const channel = await client.channels.fetch(BOT_ISSUES_CHANNEL_ID);
-    if (!channel?.isTextBased()) {
-      console.warn(`[Health] Channel ${BOT_ISSUES_CHANNEL_ID} is not text-based; skipping post`);
-      return;
-    }
     await channel.send({ content });
   } catch (err) {
     console.error("[Health] Failed to post alert:", err?.message ?? err);
