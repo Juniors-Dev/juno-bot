@@ -2,32 +2,38 @@ import Sequelize from "sequelize";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath, pathToFileURL } from "url";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const basename = path.basename(__filename);
 
-const sequelize = new Sequelize(
-  process.env.DATABASE_NAME,
-  process.env.ADMIN_USERNAME,
-  process.env.ADMIN_PASSWORD,
-  {
-    host: process.env.HOST,
-    dialect: process.env.DIALECT,
-    logging: false,
-    dialectOptions: {
-      decimalNumbers: true,
-      // Uncomment the following lines if you need to use SSL to connect to your database
-      // ssl: {
-      //   require: process.env.SSL || true,
-      //   rejectUnauthorized: process.env.DB_REJECT_UNAUTHORIZED || false,
-      // },
-    },
+const commonOptions = {
+  dialect: "postgres",
+  logging: false,
+  dialectOptions: {
+    decimalNumbers: true,
+    query_timeout: 5000,
+    statement_timeout: 30000,
+    // Uncomment the following lines if you need to use SSL to connect to your database
+    // ssl: {
+    //   require: process.env.SSL || true,
+    //   rejectUnauthorized: process.env.DB_REJECT_UNAUTHORIZED || false,
+    // },
   },
-);
+};
+
+const sequelize = process.env.DATABASE_URL
+  ? new Sequelize(process.env.DATABASE_URL, commonOptions)
+  : new Sequelize(
+      process.env.DATABASE_NAME,
+      process.env.ADMIN_USERNAME,
+      process.env.ADMIN_PASSWORD,
+      {
+        ...commonOptions,
+        host: process.env.HOST,
+        dialect: process.env.DIALECT ?? "postgres",
+      },
+    );
 
 async function createDatabase(options) {
   const db = {};
