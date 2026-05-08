@@ -16,12 +16,7 @@ export async function handleCheckResult(client, result) {
 
 async function handleSuccess(client) {
   if (consecutiveFailures === 0) return;
-  await post(
-    client,
-    `✅ **Health recovered** after ${consecutiveFailures} failed check${
-      consecutiveFailures === 1 ? "" : "s"
-    }.`,
-  );
+  await post(client, `✅ **Health recovered.**`);
 
   consecutiveFailures = 0;
   pingedThisEpisode = false;
@@ -29,19 +24,20 @@ async function handleSuccess(client) {
 
 async function handleFailure(client, result) {
   consecutiveFailures++;
-  let content =
-    `⚠️ **Health check failed** (${consecutiveFailures}/${FAILURE_THRESHOLD})\n` +
-    `Reason: \`${failureReasons(result)}\``;
+
+  if (consecutiveFailures === 1) {
+    await post(client, `⚠️ **Health check failed**\nReason: \`${failureReasons(result)}\``);
+    return;
+  }
 
   if (!pingedThisEpisode && consecutiveFailures >= FAILURE_THRESHOLD) {
     const mentions = ADMIN_USER_IDS.map((id) => `<@${id}>`).join(" ");
-    if (mentions) {
-      content += `\n\n🚨 **Repeated failures.** ${mentions}`;
-    }
+    const content = mentions
+      ? `🚨 **Persistent failure - ${consecutiveFailures} consecutive checks.** ${mentions}\nReason: \`${failureReasons(result)}\``
+      : `🚨 **Persistent failure - ${consecutiveFailures} consecutive checks.**\nReason: \`${failureReasons(result)}\``;
+    await post(client, content);
     pingedThisEpisode = true;
   }
-
-  await post(client, content);
 }
 
 function failureReasons(result) {
