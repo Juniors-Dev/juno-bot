@@ -51,7 +51,8 @@ export default class HealthService {
 
       return { ok: true, latencyMs: Date.now() - start };
     } catch (err) {
-      return { ok: false, reason: err?.message ?? String(err) };
+      const reason = err?.message || err?.code || err?.name || String(err);
+      return { ok: false, reason };
     }
   }
 }
