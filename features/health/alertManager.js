@@ -32,9 +32,10 @@ async function handleFailure(client, result) {
 
   if (!pingedThisEpisode && consecutiveFailures >= FAILURE_THRESHOLD) {
     const mentions = ADMIN_USER_IDS.map((id) => `<@${id}>`).join(" ");
+    const reasons = failureReasons(result);
     const content = mentions
-      ? `**[ALERT]** Persistent failure - ${consecutiveFailures} consecutive checks. ${mentions}\nReason: \`${failureReasons(result)}\``
-      : `**[ALERT]** Persistent failure - ${consecutiveFailures} consecutive checks. \nReason: \`${failureReasons(result)}\``;
+      ? `📢 **Persistent failure** - ${consecutiveFailures} consecutive checks. ${mentions}\nReason: \`${reasons}\``
+      : `🚨 **Persistent failure** - ${consecutiveFailures} consecutive checks. \nReason: \`${reasons}\``;
     await post(client, content);
     pingedThisEpisode = true;
   }

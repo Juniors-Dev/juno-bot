@@ -1,4 +1,4 @@
-import { Status, Client } from "discord.js";
+import { Status } from "discord.js";
 import { QueryTypes } from "sequelize";
 
 export default class HealthService {

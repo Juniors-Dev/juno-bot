@@ -24,7 +24,7 @@ export default {
       await interaction.editReply(formatResult(result));
     } catch (err) {
       console.error("[/health] Unexpected error:", err);
-      await interaction.editReply("🔴 Health check itself threw an error. Check logs.");
+      await interaction.editReply(`🔴 Health check itself threw an error: ${err?.message ?? err}`);
     }
   },
 };
@@ -62,7 +62,7 @@ function formatResult(result) {
 
   return {
     components: [container],
-    flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
+    flags: MessageFlags.IsComponentsV2,
   };
 }
 
@@ -71,5 +71,10 @@ function formatUptime(seconds) {
   const h = Math.floor((seconds / 3600) % 24);
   const m = Math.floor((seconds / 60) % 60);
   const s = Math.floor(seconds % 60);
-  return `${d}d ${h}h ${m}m ${s}s`;
+  const parts = [];
+  if (d) parts.push(`${d}d`);
+  if (d || h) parts.push(`${h}h`);
+  if (d || h || m) parts.push(`${m}m`);
+  parts.push(`${s}s`);
+  return parts.join(" ");
 }
