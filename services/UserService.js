@@ -15,20 +15,20 @@ export default class UserService {
   }
 
   async getOneId(id) {
-    return await this.User.findOne({
+    return this.User.findOne({
       where: { id },
     });
   }
 
   async create({ discordId, githubUsername, name }) {
-    return await this.User.create({ discordId, githubUsername, name });
+    return this.User.create({ discordId, githubUsername, name });
   }
 
   async updateById(id, args) {
-    return await this.User.update({ ...args }, { where: { id } });
+    return this.User.update({ ...args }, { where: { id } });
   }
 
   async updateByDiscordId(discordId, args) {
-    return await this.User.update({ ...args }, { where: { discordId } });
+    return this.User.update({ ...args }, { where: { discordId } });
   }
 }
