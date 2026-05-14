@@ -1,4 +1,4 @@
-# juno-bot
+# JunoBot
 
 A Discord bot for Juniors.dev that provides time-tracking, project management, task management, and a live server dashboard. Members clock in and out of work sessions, attach tasks and projects to those sessions, and see real-time activity on a shared channel dashboard.
 
@@ -6,12 +6,12 @@ A Discord bot for Juniors.dev that provides time-tracking, project management, t
 
 ## Features
 
-- **Session tracking** — clock in to start a timed work session, clock out to end it; sessions record activity text, duration, and linked tasks
-- **Session timers** — configurable warn-before and grace-period windows; the bot DMs a warning before the target duration expires and auto-ends the session after the grace period; timers survive bot restarts
-- **Live dashboard** — a persistent channel message showing who is currently clocked in and a daily leaderboard of total time worked; updates on a throttled trailing-edge schedule with a configurable idle refresh interval
-- **Personal dashboard** — `/my-dashboard` shows per-user monthly stats: total time, session count, average session length, longest session, best day, and active-day streak
-- **Task management** — create, update, archive, and delete tasks; filter by status; tasks can be linked to projects and attached to the active session at clock-in
-- **Project management** — create, edit, archive, restore, and delete projects; role-based membership with admin and link-add permissions; attach categorised links (GitHub, Figma, docs, etc.) to each project
+- **Session tracking** - clock in to start a timed work session, clock out to end it; sessions record activity text, duration, and linked tasks
+- **Session timers** - configurable warn-before and grace-period windows; the bot DMs a warning before the target duration expires and auto-ends the session after the grace period; timers survive bot restarts
+- **Live dashboard** - a persistent channel message showing who is currently clocked in and a daily leaderboard of total time worked; updates on a throttled trailing-edge schedule with a configurable idle refresh interval
+- **Personal dashboard** - `/my-dashboard` shows per-user monthly stats: total time, session count, average session length, longest session, best day, and active-day streak
+- **Task management** - create, update, archive, and delete tasks; filter by status; tasks can be linked to projects and attached to the active session at clock-in
+- **Project management** - create, edit, archive, restore, and delete projects; role-based membership with admin and link-add permissions; attach categorised links (GitHub, Figma, docs, etc.) to each project
 
 ---
 
@@ -130,14 +130,14 @@ node deploy-commands.js
 
 ## Architecture overview
 
-### Entry point — `index.js`
+### Entry point - `index.js`
 
 1. Connects to PostgreSQL via Sequelize and syncs models (development only).
 2. Attaches all service instances to every incoming interaction via a `prependListener` on `InteractionCreate`, making them available as `interaction.services`.
 3. Recursively loads commands from `commands/` and events from `events/`.
 4. On `ready`: restores in-memory timers for any sessions active before the process started, initialises the live dashboard, and registers cron jobs.
 
-### Interaction routing — `events/interaction/`
+### Interaction routing - `events/interaction/`
 
 The single `InteractionCreate` handler dispatches by type:
 
@@ -168,12 +168,12 @@ Commands declare a `guards` array. Before `execute` is called, each guard return
 | `requireActiveSession`   | Aborts if no active session is found; offers a Clock In button |
 | `requireNoActiveSession` | Aborts if an active session exists; offers a Clock Out button  |
 
-### Feature modules — `features/`
+### Feature modules - `features/`
 
-- `liveDashboard/` — dashboard rendering, throttled updater, idle refresh, startup initialisation
-- `session/` — timer lifecycle (warn → grace → auto-end), timer restoration, clock-in/out UI builders, personal dashboard UI
-- `tasks/` — task dashboard embed builder
-- `projects/links/` — link manager UI renderer
+- `liveDashboard/` - dashboard rendering, throttled updater, idle refresh, startup initialisation
+- `session/` - timer lifecycle (warn → grace → auto-end), timer restoration, clock-in/out UI builders, personal dashboard UI
+- `tasks/` - task dashboard embed builder
+- `projects/links/` - link manager UI renderer
 
 ---
 
