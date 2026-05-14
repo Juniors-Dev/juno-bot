@@ -66,24 +66,28 @@ Copy the example file and fill in the values before starting the bot:
 cp ".env .example" .env
 ```
 
-| Variable                  | Required | Description                                                           | Example              |
-| ------------------------- | -------- | --------------------------------------------------------------------- | -------------------- |
-| `NODE_ENV`                | No       | Set to `production` to skip DB sync on startup                        | `development`        |
-| `token`                   | Yes      | Discord bot token                                                     | `MTIz...`            |
-| `clientId`                | Yes      | Discord application client ID (used by `deploy-commands.js`)          | `123456789012345678` |
-| `guildId`                 | Yes      | Target guild (server) ID                                              | `987654321098765432` |
-| `statusChannelId`         | No       | Channel where the good morning cron job posts                         | `111222333444555666` |
-| `HOST`                    | Yes      | PostgreSQL host                                                       | `localhost`          |
-| `DATABASE_NAME`           | Yes      | PostgreSQL database name                                              | `juno_time_dev`      |
-| `ADMIN_USERNAME`          | Yes      | PostgreSQL username                                                   | `admin`              |
-| `ADMIN_PASSWORD`          | Yes      | PostgreSQL password                                                   | `secret`             |
-| `DIALECT`                 | Yes      | Sequelize dialect (must be `postgres`)                                | `postgres`           |
-| `DEFAULT_SESSION_MINUTES` | No       | Default session target duration in minutes (default: `120`)           | `120`                |
-| `MIN_SESSION_MINUTES`     | No       | Minimum session length in minutes (default: `10`)                     | `10`                 |
-| `MAX_SESSION_MINUTES`     | No       | Hard cap on session duration in minutes (default: `480`)              | `480`                |
-| `WARN_BEFORE_MINUTES`     | No       | Minutes before session end when the warning DM is sent (default: `5`) | `5`                  |
-| `GRACE_PERIOD_MINUTES`    | No       | Extra minutes after the target before auto-end fires (default: `3`)   | `3`                  |
-| `IDLE_REFRESH_MINUTES`    | No       | Dashboard idle-refresh interval in minutes (default: `5`)             | `5`                  |
+| Variable                   | Required | Description                                                           | Example               |
+| -------------------------- | -------- | --------------------------------------------------------------------- | --------------------- |
+| `NODE_ENV`                 | No       | Set to `production` to skip DB sync on startup                        | `development`         |
+| `token`                    | Yes      | Discord bot token                                                     | `MTIz...`             |
+| `clientId`                 | Yes      | Discord application client ID (used by `deploy-commands.js`)          | `123456789012345678`  |
+| `guildId`                  | Yes      | Target guild (server) ID                                              | `987654321098765432`  |
+| `statusChannelId`          | No       | Channel where the good morning cron job posts                         | `111222333444555666`  |
+| `HOST`                     | Yes      | PostgreSQL host                                                       | `localhost`           |
+| `DATABASE_NAME`            | Yes      | PostgreSQL database name                                              | `juno_time_dev`       |
+| `ADMIN_USERNAME`           | Yes      | PostgreSQL username                                                   | `admin`               |
+| `ADMIN_PASSWORD`           | Yes      | PostgreSQL password                                                   | `secret`              |
+| `DIALECT`                  | Yes      | Sequelize dialect (must be `postgres`)                                | `postgres`            |
+| `DEFAULT_SESSION_MINUTES`  | No       | Default session target duration in minutes (default: `120`)           | `120`                 |
+| `MIN_SESSION_MINUTES`      | No       | Minimum session length in minutes (default: `10`)                     | `10`                  |
+| `MAX_SESSION_MINUTES`      | No       | Hard cap on session duration in minutes (default: `480`)              | `480`                 |
+| `WARN_BEFORE_MINUTES`      | No       | Minutes before session end when the warning DM is sent (default: `5`) | `5`                   |
+| `GRACE_PERIOD_MINUTES`     | No       | Extra minutes after the target before auto-end fires (default: `3`)   | `3`                   |
+| `IDLE_REFRESH_MINUTES`     | No       | Dashboard idle-refresh interval in minutes (default: `5`)             | `5`                   |
+| `HEALTH_POLL_SCHEDULE`     | No       | Cron expression for automated health checks (default: `*/5 * * * *`)  | `*/1 * * * *`         |
+| `BOT_ISSUES_CHANNEL_ID`    | No       | Channel where health alerts are posted; alerts are silenced if unset  | `111222333444555666`  |
+| `ADMIN_USER_IDS`           | No       | Comma-separated Discord user IDs to ping on persistent failures       | `123456789,987654321` |
+| `HEALTH_FAILURE_THRESHOLD` | No       | Consecutive failures before admins are pinged (default: `3`)          | `3`                   |
 
 ---
 
@@ -127,6 +131,7 @@ node deploy-commands.js
 | `/projects-links`  | Manage links attached to your projects                                                                          |
 | `/create-user`     | Register your Discord account in the database (required before using other commands)                            |
 | `/setup-dashboard` | Initialize the live dashboard in the current channel (admin setup, run once per channel)                        |
+| `/health`          | Check bot and database health: Discord gateway status, DB latency, and process uptime. Admin only.              |
 
 ---
 
@@ -148,6 +153,20 @@ The single `InteractionCreate` handler dispatches by type:
 - **Modal submit** → same prefix approach
 - **Select menu** → same prefix approach
 
+For buttons, modals, and select menus the routing key is everything before the first `:` in `customId`. A button built with `.setCustomId("timer:pause:abc-123")` matches the `timer` entry in `buttonHandlers`. The rest of the `customId` after the first `:` can carry whatever payload the handler needs.
+
+Handlers are registered in `events/interaction/handlers/button.js` (and the equivalent `modal.js` / `select.js`) as:
+
+```js
+// events/interaction/handlers/button.js
+export const buttonHandlers = {
+  timer: {
+    run: handleTimerButtons,          // function that receives the interaction
+    context: { needsUser: true, needsSession: false }, // which DB lookups to run first
+  },
+};
+```
+
 ### Services pattern
 
 All database access goes through service classes in `services/`. Commands and handlers access them via `interaction.services`, never by importing models directly.
@@ -160,6 +179,7 @@ All database access goes through service classes in `services/`. Commands and ha
 | `projectService`   | Project CRUD; member management; archive/restore                         |
 | `linkService`      | Create, update, and delete links attached to projects                    |
 | `dashboardService` | Persist and retrieve live dashboard channel/message state                |
+| `healthService`    | Check Discord gateway and database connectivity; drives the health poll  |
 
 ### Guards
 
@@ -172,10 +192,13 @@ Commands declare a `guards` array. Before `execute` is called, each guard return
 
 ### Feature modules - `features/`
 
-- `liveDashboard/` - dashboard rendering, throttled updater, idle refresh, startup initialisation
-- `session/` - timer lifecycle (warn → grace → auto-end), timer restoration, clock-in/out UI builders, personal dashboard UI
-- `tasks/` - task dashboard embed builder
-- `projects/links/` - link manager UI renderer
+Complex logic and UI that would make command files too large is split into focused subfolders here.
+
+- `liveDashboard/` - builds and updates the persistent dashboard message in the designated channel. Handles throttling (so rapid activity does not spam Discord), the idle-refresh timer, and restoring the dashboard on bot startup.
+- `session/` - everything that happens during a work session: the countdown timer that sends a warning DM before the session ends and then auto-ends it after the grace period, restoring in-memory timers when the bot restarts, and the UI builders for the clock-in flow and personal dashboard.
+- `tasks/` - builds the embed shown in `/my-tasks`.
+- `projects/links/` - builds the UI for managing links attached to a project.
+- `health/` - runs the automated health poll on a cron schedule and posts alerts to a designated channel when checks fail or recover.
 
 ---
 
@@ -183,15 +206,18 @@ Commands declare a `guards` array. Before `execute` is called, each guard return
 
 1. Create a `.js` file in the appropriate subfolder under `commands/`.
 2. Export a default object:
+
    ```js
    export default {
      data: new SlashCommandBuilder().setName("my-command").setDescription("..."),
      guards: [], // optional
+     skipContext: false, // set to true to skip DB user lookup (interaction.botContext will not be populated)
      async execute(interaction) {
        /* ... */
      },
    };
    ```
+
 3. Run `node deploy-commands.js` to register the command with Discord.
 
 ---
@@ -206,8 +232,6 @@ pnpm lint:fix      # auto-fix
 pnpm format        # write formatting
 pnpm format:check  # check only
 ```
-
-Prettier settings: double quotes, trailing commas, 100-character print width.
 
 ---
 
