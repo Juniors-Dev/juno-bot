@@ -24,7 +24,7 @@ cd Juno-bot
 ### 2. Install dependencies
 
 ```sh
-npm install
+pnpm install
 ```
 
 ### 3. Configure the bot
@@ -75,11 +75,11 @@ This will register (or update) all slash commands for your guild.
 
 ## Troubleshooting
 
-- **Bot can't read messages?**  
+- **Bot can't read messages?**
   Ensure the "Message Content Intent" is enabled in both the Discord Developer Portal and your code.
-- **Summarization times out or fails?**  
+- **Summarization times out or fails?**
   This can happen if the Ollama server is cold-starting or overloaded. Try again, or adjust your Fly.io auto-stop settings to reduce cold starts.
-- **Token/context limits?**  
+- **Token/context limits?**
   The bot automatically chunks large message histories to fit within AI model limits.
 
 ## Development
