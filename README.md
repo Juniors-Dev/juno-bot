@@ -1,6 +1,8 @@
-# JunoBot
-
-A Discord bot for Juniors.dev that provides time-tracking, project management, task management, and a live server dashboard. Members clock in and out of work sessions, attach tasks and projects to those sessions, and see real-time activity on a shared channel dashboard.
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/4ad1172f-af27-41cf-8cb9-7079253ff5bc" width="120" alt="juno-bot" />
+  <h1>JunoBot</h1>
+  <p>A Discord bot for Juniors.dev that provides time-tracking, project management, task management, and a live server dashboard.</p>
+</div>
 
 ---
 
