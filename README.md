@@ -192,8 +192,6 @@ Commands declare a `guards` array. Before `execute` is called, each guard return
 
 ### Feature modules - `features/`
 
-Complex logic and UI that would make command files too large is split into focused subfolders here.
-
 - `liveDashboard/` - builds and updates the persistent dashboard message in the designated channel. Handles throttling (so rapid activity does not spam Discord), the idle-refresh timer, and restoring the dashboard on bot startup.
 - `session/` - everything that happens during a work session: the countdown timer that sends a warning DM before the session ends and then auto-ends it after the grace period, restoring in-memory timers when the bot restarts, and the UI builders for the clock-in flow and personal dashboard.
 - `tasks/` - builds the embed shown in `/my-tasks`.
