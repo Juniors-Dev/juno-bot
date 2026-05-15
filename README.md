@@ -44,15 +44,7 @@ Start a local PostgreSQL 15 instance using the provided compose file:
 docker-compose up -d
 ```
 
-This creates a container named `pg_juno_dev` on port `5432` with the following defaults:
-
-| Setting       | Default value   |
-| ------------- | --------------- |
-| User          | `admin`         |
-| Password      | `secret`        |
-| Database name | `juno_time_dev` |
-
-Data is persisted in a Docker volume named `pg_data`.
+This creates a container named `pg_juno_dev` on port `5432`. Data is persisted in a Docker volume named `pg_data`.
 
 In development mode the bot runs `sequelize.sync({ alter: true })` on startup, so tables are created and migrated automatically. In production (`NODE_ENV=production`) the sync step is skipped.
 
