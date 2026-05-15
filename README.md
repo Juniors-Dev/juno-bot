@@ -14,6 +14,7 @@
 - **Personal dashboard** - `/my-dashboard` shows per-user monthly stats: total time, session count, average session length, longest session, best day, and active-day streak
 - **Task management** - create, update, archive, and delete tasks; filter by status; tasks can be linked to projects and attached to the active session at clock-in
 - **Project management** - create, edit, archive, restore, and delete projects; role-based membership with admin and link-add permissions; attach categorised links (GitHub, Figma, docs, etc.) to each project
+- **Health monitoring** - an admin-only cron job polls the bot and database on a configurable schedule; results are posted to a designated channel with alerts on failure and a recovery notice when service is restored; persistent failures trigger a ping to configured admin users; an on-demand `/health` command shows Discord gateway status, database latency, and process uptime
 
 ---
 
