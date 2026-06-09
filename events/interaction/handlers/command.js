@@ -10,10 +10,11 @@ export async function handleChatInputCommand(interaction) {
   }
 
   try {
-    const context = await buildInteractionContext(interaction);
-    if (!context) return;
-
-    interaction.botContext = context;
+    if (!command.skipContext) {
+      const botContext = await buildInteractionContext(interaction);
+      if (!botContext) return;
+      interaction.botContext = botContext;
+    }
 
     if (command.guards?.length) {
       const passed = await runGuards(command.guards, interaction);
