@@ -1,4 +1,5 @@
 import {
+  ButtonStyle,
   ContainerBuilder,
   SeparatorSpacingSize,
   MessageFlags,
@@ -22,7 +23,10 @@ export function buildLiveDashboardUI({ activeSessions = [], workedToday = [] } =
     section
       .addTextDisplayComponents((text) => text.setContent(buildHeaderText(now)))
       .setButtonAccessory((btn) =>
-        btn.setCustomId("dashboard:clock_toggle").setLabel("Clock In / Out").setStyle(3),
+        btn
+          .setCustomId("dashboard:clock_toggle")
+          .setLabel("⏱ Clock In / Out")
+          .setStyle(ButtonStyle.Primary),
       ),
   );
   container.addSeparatorComponents((sep) =>
